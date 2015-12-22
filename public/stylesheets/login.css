@@ -1,0 +1,72 @@
+*
+{
+  padding: 0;
+  margin: 0;
+}
+html,body
+{
+  height: 100%;
+  background: #3F4F68;
+}
+article > h1:first-child
+{
+  letter-spacing: 2px;
+  padding:20% 0;
+  color: white;
+  text-align: center;
+}
+.di_login_containbox
+{
+  background: white;
+  padding: 10% 0;
+  width: 90%;
+  margin: auto;
+  border-radius: 5px;
+  box-shadow: 0 0 1px 1px #eee;
+}
+.di_login_containbox > div
+{
+  padding: 5px;
+  /*margin-top: 10px;*/
+}
+.di_login_containbox input
+{
+  width: 100%;
+  height: 30px;
+  outline: none;
+  border:none;
+  border-bottom: solid 1px #ddd;
+}
+.di_btn_box
+{
+  width:80%;
+  margin: auto;
+  padding: 20px 0;
+}
+.di_btn_box a
+{
+  color: white;
+}
+.di_btn_box a:nth-of-type(1)
+{
+  font-size: 11pt;
+}
+.di_btn_box > div
+{
+  margin-top: 10px;
+}
+
+.di_btn
+{
+  display: block;
+  height: 30px;
+  text-align: center;
+  background: #22aadd;
+  line-height: 30px;
+  margin: auto;
+  border-radius: 5px;
+  letter-spacing: 3px;
+  border:solid 1px #ccc;
+  box-shadow: 0 0 2px 2px #bbb;
+  text-decoration: none;
+}

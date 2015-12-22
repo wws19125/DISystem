@@ -1,0 +1,21 @@
+doctype html
+html
+    meta(charset='utf8')
+    meta(name='viewport',content='width=device-width,initial-scale=1,maximum=1,user-scalable=no')
+    head
+      title 欢迎登陆
+      link(rel='stylesheet',type='text/css' href='stylesheets/login.css')
+  body
+    article
+      h1 DISystem
+      div.di_login_containbox
+        div
+          input(type='text',name='txt_username',id='txt_username',placeHolder='请输入用户名')
+        div
+          input(type='password',name='txt_username',id='txt_username',placeHolder="请输入密码")
+      div.di_btn_box
+        div
+          input(type='checkbox',checked)
+          a 记住我
+        div
+          a.di_btn(href='/') Login
