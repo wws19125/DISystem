@@ -6,5 +6,153 @@
 html,body
 {
   height: 100%;
-  background: #3F4F68;
+  /*background: #3F4F68;*/
 }
+*
+    {
+      padding: 0px;
+      margin: 0px;
+      /*box-sizing: border-box;*/
+    }
+    html,body{
+      height: 100%;
+      /*overflow-x: hidden;*/
+    }
+    header
+    {
+      width: 100%;
+      text-align: center;
+      padding: 20px 2px;
+    }
+    article
+    {
+      overflow-x: hidden;
+      width: 100%;
+    }
+    .di_container_box
+    {
+      width: 100%;
+    }
+    .di_container_box > *
+    {
+      float: left;
+    }
+    .di_container_box > aside:nth-child(1)
+    {
+      width: 200px;
+      background: #663366;
+      color: white;
+      padding: 20px 5px;
+      margin-left: 4px;
+    }
+    .di_container_box > aside:nth-child(1) > h3
+    {
+      width: 100%;
+      text-align: center;
+      border-bottom: dashed 3px #888;
+      margin-bottom: 10px;
+    }
+    .di_container_box > aside:nth-child(1)  li
+    {
+      padding-left: 10%;
+      margin-top: 8px;
+    }
+    .di_container_box > aside:nth-child(1)  li a
+    {
+      color: white;
+      font-size: 11pt;
+      letter-spacing: 2px;
+    }
+    .di_detail
+    {
+      margin-left: 10px;
+      margin-top: 4px;
+    }
+    .di_detail
+    {
+      width: 95%;
+      z-index: 1;
+    }
+    @media screen and (min-width: 600px) {
+      .di_detail
+      {
+        width: calc(100% - 240px);
+        z-index: 100;
+      }
+    }
+    /*
+    @media screen and (min-width: 500px) {
+      .di_detail
+      {
+        width: 200px;
+        background: blue;
+      }
+    }*/
+
+    .di_detail > section
+    {
+      border:solid 1px white;
+      padding: 10px;
+      background: #eee;
+      box-shadow: 0 0 4px 4px #ccc;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .di_detail > section > div
+    {
+      margin: 10px 0px;
+    }
+    .di_detail > section  div
+    {
+      padding-left: 10px;
+    }
+    .di_detail > section div > a:nth-child(1)
+    {
+      color: green;
+      font-weight: bolder;
+      text-shadow: 0 0 1px #339933;
+    }
+    .di_detail > section a:nth-child(1)
+    {
+      color: #336699;
+      font-weight: bold;
+    }
+    .di_detail > section  ul
+    {
+      padding-left: 40px;
+    }
+    .di_detail > section > div:nth-of-type(2) ul
+    {
+      list-style: none;
+    }
+    .di_detail > section > div:nth-of-type(2) ul > li:first-child
+    {
+      color: red;
+    }
+    .di_detail > section > div:nth-of-type(2) ul > li:last-child
+    {
+      left: -5px;
+      color: red;
+    }
+    .di_name
+    {
+      display: block;
+      color: red;
+      font-size: 14pt;
+      font-weight: bolder;
+    }
+    .di_back_to_category
+    {
+      position: fixed;
+      top: 40%;
+      right: 10px;
+      width: 80px;
+      height: 80px;
+      background: #663366;
+      border-radius: 5px;
+      line-height: 80px;
+      text-align: center;
+      border:solid 1px white;
+      box-shadow: 0px 0px 4px 4px #666666;
+      color: white;
+    }

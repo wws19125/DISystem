@@ -1,14 +1,19 @@
-//extends layout
-
-//block content
-  //h1= title
-  //p Welcome to #{title}
-doctype html
 html
   meta(charset='utf8')
   meta(name='viewport',content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no')
   head
     title=title
     link(rel='stylesheet',type='text/css',href='stylesheets/index.css')
+    script(src='plugins/jquery.js')
+    script(src='javascripts/index.js')
   body
-    
+    article
+      header
+        <h1>金恒聚视数据接口
+      a.di_back_to_category(href="#category_root") 目录
+      div.di_container_box
+        aside(style="top:0;")
+          h3
+            a(name="category_root") 目录
+          ul
+        div.di_detail(style="margin-left: 10;")
