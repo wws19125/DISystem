@@ -217,17 +217,17 @@ function getReturn(jsonData){
 };
     window.onload = function(){
       $.ajax({
-        url:'home/update',
+        url:'/home/update',
         type:'post',
         data:{data:JSON.stringify(data)},
         success:function(data){
           console.log("ok");
         },
         error:function(){
-          console.log(data);
+          //console.log(data);
         },
         complete:function(){
-          console.log(data);
+          //console.log(data);
         }
       });
       var html = "";

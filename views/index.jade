@@ -1,19 +1,25 @@
-html
-  meta(charset='utf8')
-  meta(name='viewport',content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no')
-  head
-    title=title
-    link(rel='stylesheet',type='text/css',href='stylesheets/index.css')
-    script(src='plugins/jquery.js')
-    script(src='javascripts/index.js')
+extends layout
+
+block doctype
+  doctype html
+
+block header
+  link(rel="stylesheet",href="stylesheets/index.css")
+  script.
+    $(function(){
+      if(window.history.length<=0)
+      {
+        $(".di_toolbar_back").css("display","none");
+      }
+      $("ul").on("click","li",function(){
+        window.location.href="/home/{0}/detail".format(this.id);
+      });
+    });
+
+block content
   body
-    article
-      header
-        <h1>金恒聚视数据接口
-      a.di_back_to_category(href="#category_root") 目录
-      div.di_container_box
-        aside(style="top:0;")
-          h3
-            a(name="category_root") 目录
-          ul
-        div.di_detail(style="margin-left: 10;")
+    ul
+      each val, index in data
+        li(id=val._id)
+          a(id=val._id)=val.name
+          a=val.desc

@@ -1,0 +1,21 @@
+extends layout
+
+block doctype
+  
+
+block header
+  link(rel='stylesheet',type='text/css',href='/stylesheets/diDetail.css')
+  script(src='/plugins/jquery.js')
+  script(src='/javascripts/diDetail.js')
+
+block content
+  article
+    header
+      <h1>金恒聚视数据接口
+    a.di_back_to_category(href="#category_root") 目录
+    div.di_container_box
+      aside(style="top:0;")
+        h3
+          a(name="category_root") 目录
+        ul
+      div.di_detail(style="margin-left: 10;")

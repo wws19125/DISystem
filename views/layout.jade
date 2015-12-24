@@ -1,7 +1,16 @@
-doctype html
+block doctype
 html
+  meta(charset='utf8')
+  meta(name='viewport',content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no')
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel="stylesheet",href="/stylesheets/disystem.css")
+    script(type="text/javascript",src="/plugins/jquery.js")
+    script(type="text/javascript",src="/javascripts/disystem.js")
+    block header
   body
+    header.di_toolbar
+      nav.di_toolbar_navbar
+        a.di_toolbar_back back
+        a.di_toolbar_title=title
     block content

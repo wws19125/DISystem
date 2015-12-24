@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var MongoClient = require('mongodb').MongoClient;
+//var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+var DataInterface = require('../modules/dataInterface.js');
+var Project = require('../modules/project.js');
+
 
 function guid() {
   function S4() {
@@ -12,8 +15,6 @@ function guid() {
 
 var url = 'mongodb://localhost:27017/test';
 router.post('/update',function(req,res,next){
-  //console.log(req.query);
-  //console.log(req.body);
   res.json({ok:12});
   return;
   var data = JSON.parse(req.body.data);
@@ -49,21 +50,21 @@ router.post('/update',function(req,res,next){
 });
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-  //var url = 'mongodb://localhost:27017/test';
+  Project.get(function(err,data){
+    if(err)
+    {
+      res.render('index', { title: 'DISystem' });
+    }
+    else
+    {
+      console.log(data);
+      res.render('index',{ title :"DISystem",data:data});
+    }
+  });
+  /*
   MongoClient.connect(url,function(err,db){
     assert.equal(null,err);
     console.log('Connected correctly to server.');
-    /*
-    db.collection("t",function(err,collection){
-      collection.find({name:'wang'},function(err,data){
-        if(data)
-        {
-          console.log(data);
-        }
-      });
-    });
-    */
     var cursor = db.collection('t').find();
     //cursor.forEach(printjson);
     cursor.each(function(err,doc){
@@ -74,9 +75,12 @@ router.get('/', function(req, res, next) {
         db.close();
       }
     });
-    //db.close();
   });
-  res.render('index', { title: 'DISystem' });
+  */
+});
+
+router.get('/:projectId/detail',function(req,res,next){
+    res.render('diDetail',{title:"接口详细"});
 });
 
 module.exports = router;
