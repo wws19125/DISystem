@@ -6,14 +6,7 @@ var DataInterface = require('../modules/dataInterface.js');
 var Project = require('../modules/project.js');
 
 
-function guid() {
-  function S4() {
-    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-  }
-  return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
-}
-
-var url = 'mongodb://localhost:27017/test';
+//var url = 'mongodb://localhost:27017/test';
 router.post('/update',function(req,res,next){
   res.json({ok:12});
   return;
@@ -21,8 +14,16 @@ router.post('/update',function(req,res,next){
   //console.log(data);
   for(var i=0;i<data.length;i++)
   {
-    data[i]["_id"] = guid();
+    data[i]["projectId"] = "638f2370-f584-a077-c0ad-447b43dc635f";
   }
+  DataInterface.save(data,function(error,data){
+    if(error)
+      res.json({status:-1,code:-1,err:error});
+    else {
+      res.json({status:0,code:200});
+    }
+  });
+  return;
   //console.log("===========");
   //return;
   MongoClient.connect(url,function(err,db){
@@ -40,14 +41,9 @@ router.post('/update',function(req,res,next){
       });
 
     });
-
-    //console.log(data[0]);
-    //var ct = db.collection("t");
-    //t.insert(data);
   });
-
-
 });
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   Project.get(function(err,data){
@@ -57,7 +53,6 @@ router.get('/', function(req, res, next) {
     }
     else
     {
-      console.log(data);
       res.render('index',{ title :"DISystem",data:data});
     }
   });
@@ -80,6 +75,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:projectId/detail',function(req,res,next){
+    DataInterface.getByProjectId(req.params.projectId,function(error,data){});
     res.render('diDetail',{title:"接口详细"});
 });
 

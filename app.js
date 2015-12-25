@@ -7,7 +7,9 @@ var bodyParser = require('body-parser');
 
 var homes = require('./routes/index');
 var users = require('./routes/users');
-var auths = require('./routes/auth');
+var auths = require('./routes/auths');
+var datainterfaces = require('./routes/dataInterfaces');
+
 var app = express();
 
 // view engine setup
@@ -25,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', auths);
 app.use('/users', users);
 app.use('/home',homes);
+app.use('/di',datainterfaces);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

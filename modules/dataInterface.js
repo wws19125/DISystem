@@ -18,7 +18,9 @@
   }
 }
 */
-var db = require("./db");
+var mongodb = require("./db");
+var util = require("./util");
+
 function DataInterface(di)
 {
   di = di||{};
@@ -27,10 +29,88 @@ function DataInterface(di)
   this.intro = di.intro||"未填写";
   this.params = di.params||[];
   this.retContent = di.retContent||"无";
+  this._id = di._id||util.guid();
+  this.projectId = di.projectId||"-1";
 }
 
 module.exports = DataInterface;
 
-DataInterface.prototype.save = function(di){
-  console.log("===========save============");
+///save record
+///
+DataInterface.save = function(di,callback){
+  //console.log(di);
+  if(di instanceof Array)
+  {
+    di.forEach(function(item,index)
+    {
+      item._id = util.guid();
+      console.log(item.projectId);
+      if(!item.projectId||item.projectId=="-1")
+      {
+        callback({reason:"Arrays no project id",status:-1});
+        return;
+      }
+    });
+  }
+  else
+  {
+    di._id = util.guid();
+    if(!di.projectId||di.projectId=="-1")
+    {
+      console.log("di no project id");
+      callback({reason:"di no project id",status:-1});
+      return;
+    }
+  }
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({reason:"open error",error:err,status:-1});
+    }
+    db.collection("datainterfaces",function(err,collection){
+      if(err)
+      {
+        mongodb.close();
+        return callback({reason:"open error",error:err,status:-1});
+      }
+      collection.insert(di,{safe: true}, function(err, di){
+          callback(err,di);
+          mongodb.close();
+      });
+    });
+  });
 };
+
+DataInterface.getById = function(_id,callback)
+{
+
+}
+
+DataInterface.getByProjectId = function(projectId,callback)
+{
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({reason:"open error",error:err,status:-1});
+    }
+    db.collection("datainterfaces",function(err,collection){
+      if(err)
+      {
+        mongodb.close();
+        return callback({reason:"open collection error",error:err,status:-1});
+      }
+      collection.find({projectId:projectId},{_id:0},function(err,cursor){
+        if(cursor)
+        {
+          console.log(cursor);
+          var result = [];
+          cursor.each(function(err,doc){
+            console.log(doc);
+          });
+        }
+      });
+    });
+  });
+}

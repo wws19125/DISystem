@@ -14,156 +14,7 @@ String.prototype.format = function(){
       return "<font color='red'>{0}</font>".format(_old);
     });
   };
-    var data = [
-      {
-        name:"登陆",
-        format:"itegration/appUser/checkLogin/{userno}/{password}?token",
-        intro:"这是一个登陆接口，用于用户登陆",
-        params:[
-          {name:"userno",intro:"工号,base64加密"},
-          {name:"password",intro:"密码,base64加密"}
-        ],
-        retContent:{
-          "message":"返回消息提示",
-          "showcard":"N",
-          "statusCode":"状态码",
-          "token":"令牌",
-          "username":"用户名",
-          "userno":"工号",
-          "test(测试使用)":[{a:"测试的a"}]
-        }
-      },
-      {
-        name:"报表",
-        format:"itegration/appservice/ReportService/getReportItemsPermission/{userno}?token={token}",
-        intro:"获取报表接口，用于获取报表菜单",
-        params:[
-          {name:"userno",intro:"工号"},
-          {name:"token",intro:"令牌"}
-        ]
-      },
-      {
-        name:"反馈",
-        format:"itegration/appUser/addFeeBack/{userno}/{username}?strContent={content}&token={token}",
-        intro:"用于反馈信息",
-        params:[
-          {name:"userno",intro:"工号"},
-          {name:"username",intro:"用户名"},
-          {name:"content",intro:"反馈内容"},
-          {name:"token",intro:"令牌"}
-        ]
-      },
-      {
-        name:"修改密码",
-        format:"itegration/appUser/update_user_Password/{userno}/{npassword}/{opassword}?token={token}",
-        intro:"用户密码修改接口",
-        params:[
-          {name:"userno",intro:"工号"},
-          {name:"npassowrd",intro:"新用户密码,base64加密"},
-          {name:"opassword",intro:"旧的用户密码,base64加密"},
-          {name:"token",intro:"令牌"}
-        ]
-      },
-      {
-        name:"获取用户信息",
-        format:"itegration/appUser/getUserInfo/{userno}?token={token}",
-        intro:"获取用户信息，如用户名等",
-        params:[
-          {name:"userno",intro:"工号"},
-          {name:"token",intro:"令牌"}
-        ]
-      },
-      {
-        name:"画面菜单",
-        format:"itegration/returnChild_MsgById/a8d9d9756b684bf4b3e536e9f60fbc7a/returnChild_menu",
-        intro:"获取实时画面菜单",
-        params:[
-        ]
-      },
-      {
-        name:"获取资源压缩文件",
-        format:"static/others/images/resources.zip",
-        intro:"获取资源压缩文件，在手机中进行解压",
-        params:[
-        ],
-        retContent:"压缩包，zip格式，需要解压"
-      },
-      {
-        name:"获取资源配置",
-        format:"static/others/images/resources.json",
-        intro:"获取资源配置，用于升级使用",
-        params:[
-        ],
-        retContent:"配置文件json"
-      },
-      {
-name:"视频",
-format:"itegration/returnChild_MsgById/dcda957a6864460abcd62185a5712b25/returnChild_menu",
-intro:"获取视频里面需要的所有信息",
-params:[
 
-],
-retContent:{
-    "message": "根据当前节点UUID获取下一层的信息成功",
-    "statusCode":"状态码",
-    "data": [
-    {
-        "createDateTime": "创建时间",
-        "targetURL": "",
-        "Fid":"父截图id",
-        "intIsDelete": 0,
-        "id": "截图id",
-        "strName": "监控区域名称",
-        "nodeIcon": "",
-        "main_type": "FV",
-        "child_id": "子截图id",
-        "intIsLeaf": 0,
-        "intPriority": "优先级",
-        "intIsActive": 1,
-        "companyId": "公司id",
-        "nodeType": "节点类型",
-        "updateDateTime": "更新时间",
-        "createUserId": "创建者id"
-    }
-    ]
-}
-},
-{
-name:"视频截图",
-format:"static/others/PicCapture/{PictureID}.jpg",
-intro:"获取视频截图",
-params:[
-   {name:"PictureID",intro:"根据返回的nodeType类型判断，如果nodeType返回的值是F,就继续判断返回的child_id是否为空，如果为空，PictureID的值就为返回的id值，child_id不为空，PictureID的值就是child_id;如果nodeType返回的值不是F，PictureID的值为返回的id的值"}
-],
-retContent:{}
-},
-{
-name:"视频播放",
-format:"rtmpt://host:5080/JHFocusView?UserId=testuser/{id}",
-intro:"视频播放",
-params:[
-{ name:"id",intro:"如果获取的child_id为空，id就是返回的id,如果返回的child_id不为空，则此节点下面还有其他视频监控点，不能直接播放"}
-]
-},{
-name:"报表分类",
-format:"itegration/appservice/ReportService/getReportItemsPermission/{userNo}?token={token}",
-intro:"获取报表的类别和下一节点的信息",
-params:[
-{name:"userNo",intro:"工号"},
-{name:"token",intro:"令牌"}
-],
-retContent:[
-    {
-  "id":"id",
-        "strClass": "类型",
-        "intOrder":"优先级",
-        "strContentName": "报表类别",
-        "strTitle": "报表标题"
-    }
-]
-
-}
-    ];
 var template = "<section>\
       <a name='#{0}' class='di_name'>{1}</a>\
       <div>\
@@ -216,12 +67,13 @@ function getReturn(jsonData){
       return html;
 };
     window.onload = function(){
+      return;
       $.ajax({
         url:'/home/update',
         type:'post',
         data:{data:JSON.stringify(data)},
         success:function(data){
-          console.log("ok");
+          console.log(JSON.stringify(data));
         },
         error:function(){
           //console.log(data);
