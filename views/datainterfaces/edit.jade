@@ -1,0 +1,242 @@
+extends ../layout
+block doctype
+  doctype html
+
+block header
+  style.
+    body
+    {
+      overflow:hidden;
+    }
+    article
+    {
+      margin:auto;
+      height:calc(100% - 60px);
+      width:95%;
+      margin-top:60px;
+      overflow-y:scroll;
+    }
+    input[type='text']
+    {
+      height:36px;
+      outline:none;
+      border:none;
+      border-bottom:solid 1px #ccc;
+      padding-left:1%;
+      margin-bottom:10px;
+    }
+    .di_input input[type='text']
+    {
+      height:36px;
+      outline:none;
+      border:none;
+      border-bottom:solid 1px #ccc;
+      width:98%;
+    }
+    article > div > div > a
+    {
+      display:block;
+    }
+    .di_method
+    {
+      display: -moz-box;
+      display: -webkit-box;
+      display: box;
+      display:flex;
+      width:95%;
+      margin:auto;
+    }
+    .di_method > a
+    {
+      flex:1;
+      -moz-box-flex: 1;
+      -webkit-box-flex: 1;
+      box-flex: 1;
+      text-align:center;
+      padding:10px 0px;
+      background:#ddd;
+      border:1px solid #888;
+      border-radius:3px;
+      font-weight:bolder;
+    }
+    .di_param
+    {
+      margin-top:20px;
+    }
+    .di_add_param
+    {
+      width:100px;
+      padding:12px;
+      background:#22aadd;
+      border-radius:5px;
+      color:white;
+      text-align:center;
+      margin:auto;
+      margin-top:10px;
+      margin-bottom:10px;
+    }
+    .di_param_field
+    {
+      display: -moz-box;
+      display: -webkit-box;
+      display: box;
+      display:flex;
+    }
+    .di_param_field > input:nth-of-type(1)
+    {
+      width:100px;
+    }
+    .di_param_field > input:nth-of-type(2)
+    {
+      flex:1;
+      -moz-box-flex: 1;
+      -webkit-box-flex: 1;
+      box-flex: 1;
+    }
+    .a_btn_delete
+    {
+      display:inline-block;
+      width:26px;
+      height:26px;
+      background:#ff6666;
+      border-radius:13px;
+      position:relative;
+    }
+    .a_btn_delete::before
+    {
+      content:"";
+      position:absolute;
+      width:20px;
+      height:4px;
+      background:white;
+      border-radius:2px;
+      top:11px;
+      left:3px;
+    }
+    textarea
+    {
+      width:95%;
+      margin:auto;
+      border:1px solid #22aadd;
+      border-radius:4px;
+    }
+    .di_retContent ul
+    {
+      padding-left:10px;
+    }
+    .di_retContent li
+    {
+      display:block;
+    }
+    li a
+    {
+      text-indent:2em;
+      display:inline-block;
+    }
+    a+ul
+    {
+      margin-left:2em;
+    }
+  script.
+    var paramField = '<div class="di_param_field"><input type="text" placeholder="参数">&nbsp;<input type="text" placeholder="参数说明">&nbsp;<a class="a_btn_delete"></a></div>';
+    function getReturn(jsonData,objName){
+      var html = "";
+      if(typeof jsonData=="object")
+      {
+        if(jsonData instanceof Array)
+        {
+          if((!(jsonData[0] instanceof Array)&&(typeof jsonData[0])!="object")||jsonData.length==0)
+          {
+            //if((typeof jsonData[0])!="object")
+              html += "&nbsp;<input type='text' value='{0}' data-path='{1}' />".format(jsonData[0]||"数组",objName);
+            //else
+              //html += "<li><a>{0}</a>{1}".format(objName,getReturn(jsonData[0],"{0}.{1}".format(objName)));
+          }
+          else
+          {
+            jsonData.splice(1,jsonData.length-1);
+            html += "<ul><li>[</li>&nbsp;&nbsp;{0}<li>]</li></ul>".format(getReturn(jsonData[0],"{0}[0]".format(objName)));
+          }
+        }
+        else
+        {
+          html += "<ul><li>{</li>";
+          for(var item in jsonData)
+          {
+            html += "<li><a>{0}</a>{1}".format(item,getReturn(jsonData[item],"{0}.{1}".format(objName,item)));
+          }
+          html += "<li>}</li></ul>";
+        }
+      }
+      else
+      {
+        html += "&nbsp;<input type='text' value='{0}' data-path='{1}' />".format(jsonData,objName);
+      }
+      return html;
+    };
+    $(function(){
+      $(".di_method").on("click",function(e){
+        $("a",this).css({"background":"#ddd","color":"#666","border":"1px solid #888"});
+        $(e.srcElement||e.target).css({"background":"#22aadd","color":"white","border":"1px solid #22eeee"});
+      });
+      $(".di_param").on("click",function(e){
+        var target = e.srcElement||e.target;
+        if(target.classList.contains("a_btn_delete"))
+        {
+          $(target).parents("div.di_param_field").remove();
+          return;
+        }
+        if(target.classList.contains("di_add_param"))
+        {
+          $(target).before(paramField);
+          return;
+        }
+      });
+      var returnContent = "";
+      $("textarea").keyup(function(){
+        var flag=false;
+        try
+        {
+          returnContent = JSON.parse(this.value);
+          flag = true;
+        }
+        catch(e)
+        {
+          flag = false;
+        }
+        finally
+        {
+          var html = flag ? getReturn(returnContent,"returnContent") : "";
+          $(this).next().html(html);
+        }
+      });
+
+      $(".di_retContent_field").on("keyup","input",function(){
+        eval("{0}='{1}'".format(this.dataset.path,this.value));
+        $("textarea").val(JSON.stringify(returnContent));
+      });
+    });
+
+block content
+  article
+    div
+      div.di_input
+        input(type='text',placeHolder="接口格式")
+      div.di_input
+        input(type='text',placeHolder="接口说明")
+      div.di_method
+        a GET
+        a POST
+        a PUT
+        a DELETE
+      div.di_param
+        div.di_param_field
+          input(type='text',placeHolder='参数')
+          &nbsp
+          input(type='text',placeHolder='参数说明')
+          &nbsp;
+          a.a_btn_delete
+        a.di_add_param 添加参数
+      div.di_retContent
+        textarea(rows=8,placeHolder="返回值")
+        div.di_retContent_field

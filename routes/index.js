@@ -75,8 +75,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:projectId/detail',function(req,res,next){
-    DataInterface.getByProjectId(req.params.projectId,function(error,data){});
-    res.render('diDetail',{title:"接口详细"});
+    //sDataInterface.getByProjectId(req.params.projectId,function(error,data){});
+    res.render('diDetail',{title:"接口详细",projectId:req.params.projectId});
 });
 
 module.exports = router;

@@ -18,25 +18,11 @@ Project.get = function(callback){
     db.collection("projects",function(err,collection){
       if(err)
       {
-        mongodb.close();
         return callback(err);
       }
-
-      collection.find({name:"金恒聚视"},function(err,cursor){
-        if(cursor)
-        {
-          var result = [];
-          cursor.each(function(err,doc){
-            if(doc)
-            {
-              result.push(doc);
-              callback(err,result);
-              mongodb.close();
-            }
-          });
-        }
+      collection.find({name:"金恒聚视"}).toArray(function(err,result){
+        callback(err,result);
       });
-
     });
   });
 }

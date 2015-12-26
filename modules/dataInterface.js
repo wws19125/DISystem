@@ -81,7 +81,6 @@ DataInterface.save = function(di,callback){
     });
   });
 };
-
 DataInterface.getById = function(_id,callback)
 {
 
@@ -98,19 +97,10 @@ DataInterface.getByProjectId = function(projectId,callback)
     db.collection("datainterfaces",function(err,collection){
       if(err)
       {
-        mongodb.close();
+        //mongodb.close();
         return callback({reason:"open collection error",error:err,status:-1});
       }
-      collection.find({projectId:projectId},{_id:0},function(err,cursor){
-        if(cursor)
-        {
-          console.log(cursor);
-          var result = [];
-          cursor.each(function(err,doc){
-            console.log(doc);
-          });
-        }
-      });
+      collection.find({projectId:projectId},{_id:0}).toArray(callback);
     });
   });
 }

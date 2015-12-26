@@ -3,13 +3,15 @@
   padding: 0px;
   margin: 0px;
 }
-html,body
+html
 {
   height: 100%;
 }
+
 body
 {
-  padding-top: 64px;
+  height:100%;
+  /*padding-top: 64px;*/
 }
 .di_toolbar
 {
@@ -29,17 +31,17 @@ body
 {
   position: absolute;
   display: block;
-  width: 50px;
-  height: 20px;
-  left: 30px;
-  line-height: 20px;
-  top:8px;
+  width: 0px;
+  height: 0px;
+  left: 10px;
+  line-height: 22px;
+  top:12.5px;
   color: #eee;
-  /*padding-left: 20px;*/
-  font-size: 16px;
-  background: #aaa;
-  display: none;
+  border-top:solid 10px transparent;
+  border-bottom:solid 10px transparent;
+  border-right:solid 15px white;
 }
+/*
 .di_toolbar_back::before
 {
   content: " ";
@@ -52,6 +54,7 @@ body
   position: absolute;
   left:-15px;
 }
+*/
 .di_toolbar_title
 {
   display: block;
@@ -60,4 +63,34 @@ body
   background: #344056;
   line-height: 45px;
   color: white;
+}
+.di_toolbar_right_menu
+{
+  position: absolute;
+  right: 10px;
+  top:12.5px;
+  width: 25px;
+  height: 3px;
+  background: white;
+  /*display: none;*/
+}
+.di_toolbar_right_menu::after
+{
+  position: absolute;
+  width: 25px;
+  background: white;
+  display: block;
+  content: " ";
+  height: 3px;
+  bottom:-8px;
+}
+.di_toolbar_right_menu::before
+{
+  position: absolute;
+  width: 25px;
+  background: white;
+  display: block;
+  content: " ";
+  height: 3px;
+  bottom:-16px;
 }

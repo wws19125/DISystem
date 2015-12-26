@@ -1,7 +1,7 @@
 extends layout
 
 block doctype
-  
+
 
 block header
   link(rel='stylesheet',type='text/css',href='/stylesheets/diDetail.css')
@@ -9,7 +9,7 @@ block header
   script(src='/javascripts/diDetail.js')
 
 block content
-  article
+  article(data-id=projectId)
     header
       <h1>金恒聚视数据接口
     a.di_back_to_category(href="#category_root") 目录

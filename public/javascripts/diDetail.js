@@ -67,13 +67,11 @@ function getReturn(jsonData){
       return html;
 };
     window.onload = function(){
-      return;
       $.ajax({
-        url:'/home/update',
-        type:'post',
-        data:{data:JSON.stringify(data)},
+        url:'/di/{0}/list-for-project'.format(document.querySelector("article").dataset.id),
+        type:'get',
         success:function(data){
-          console.log(JSON.stringify(data));
+          showDetail(data.dataContent);
         },
         error:function(){
           //console.log(data);
@@ -82,6 +80,8 @@ function getReturn(jsonData){
           //console.log(data);
         }
       });
+      function showDetail(data)
+      {
       var html = "";
       var params = ""
       var retContents = "";
@@ -106,7 +106,7 @@ function getReturn(jsonData){
       }
       document.querySelector("aside").querySelector("ul").innerHTML = html;
       html = "";
-      //data = undefined;
+    }
       //postion
       var style = undefined;
       if(window.getComputedStyle)
@@ -117,7 +117,6 @@ function getReturn(jsonData){
         style = document.querySelector(".di_detail").currentStyle;
       if(style)
       {
-        //var category = document.querySelector(".di_container_box").querySelector("aside");
         if(style["z-index"]==100)
         {
           var target = document.querySelector("aside");
