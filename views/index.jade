@@ -6,20 +6,32 @@ block doctype
 block header
   link(rel="stylesheet",href="stylesheets/index.css")
   script.
+    window.sessionStorage.setItem("root",1);
     $(function(){
-      if(window.history.length<=0)
-      {
-        $(".di_toolbar_back").css("display","none");
-      }
+      DISystem.hiddenMenu();
+      $(".di_toolbar_back").on("click",function(){
+        DISystem.goBack();
+      });
       $("ul").on("click","li",function(){
-        window.location.href="/home/{0}/detail".format(this.id);
+        if(!(/^di/.test(this.id)))
+          window.location.href="/home/{0}/detail".format(this.id);
+        else
+        {
+          window.location.href="/home/project/new";
+        }
+      });
+      DISystem.addRightMenu("btn_new_project","新建",{"color":"white","top":"13.5px","right":"15px"},function(){
+        window.location.href="/home/project/new";
       });
     });
 
 block content
   body
-    ul
-      each val, index in data
-        li(id=val._id)
-          a(id=val._id)=val.name
-          a=val.desc
+    article
+      ul
+        each val, index in data
+          li(id=val._id)
+            a(id=val._id)=val.name
+            a=val.desc
+        li#di_new_project.di_pc_only
+          a 新建项目

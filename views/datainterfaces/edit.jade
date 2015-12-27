@@ -137,6 +137,14 @@ block header
     {
       margin-left:2em;
     }
+    .di_method_selected
+    {
+
+    }
+    .di_method_nomal
+    {
+
+    }
   script.
     var paramField = '<div class="di_param_field"><input type="text" placeholder="参数">&nbsp;<input type="text" placeholder="参数说明">&nbsp;<a class="a_btn_delete"></a></div>';
     function getReturn(jsonData,objName){
@@ -175,10 +183,19 @@ block header
       return html;
     };
     $(function(){
+      DISystem.hiddenMenu();
       $(".di_method").on("click",function(e){
-        $("a",this).css({"background":"#ddd","color":"#666","border":"1px solid #888"});
-        $(e.srcElement||e.target).css({"background":"#22aadd","color":"white","border":"1px solid #22eeee"});
+        $("a",this).css({"background":"#ddd","color":"#666","border":"1px solid #888"}).removeClass("method-selected");
+        $(e.srcElement||e.target).css({"background":"#22aadd","color":"white","border":"1px solid #22eeee"}).addClass("method-selected");
       });
+      if($(".method-selected").length<=0)
+      {
+        $(".di_method > a:first").click();
+      }
+      else
+      {
+        $(".method-selected").click();
+      }
       $(".di_param").on("click",function(e){
         var target = e.srcElement||e.target;
         if(target.classList.contains("a_btn_delete"))
@@ -202,6 +219,7 @@ block header
         }
         catch(e)
         {
+          returnContent = this.value;
           flag = false;
         }
         finally
@@ -209,34 +227,100 @@ block header
           var html = flag ? getReturn(returnContent,"returnContent") : "";
           $(this).next().html(html);
         }
-      });
+      }).keyup();
 
       $(".di_retContent_field").on("keyup","input",function(){
         eval("{0}='{1}'".format(this.dataset.path,this.value));
         $("textarea").val(JSON.stringify(returnContent));
       });
+      DISystem.addRightMenu("btn_store","保存",{"color":"white","display":"block","top":"13.5px","right":"15px"},function(){
+          if($("input#di_format").val()=="")
+          {
+            alert("请输入完成后保存");
+            return;
+          }
+          var projectId = document.querySelector("article").dataset.pid;
+          var retData = {
+            _id:document.querySelector("article").dataset.did,
+            projectId:projectId||"-1",
+            name:$("input#di_name").val(),
+            format:$("input#di_format").val(),
+            intro:$("input#di_intro").val(),
+            method:$("a.method-selected").html(),
+            params:getParam(),
+            retContent:returnContent
+          };
+          $.ajax({
+            type:document.querySelector("article").dataset.did=="-1"?'post':'put',
+            url:window.location.href,
+            data:{dataBody:JSON.stringify(retData)},
+            success:function(data){
+              if(data.code===200)
+              {
+                DISystem.showTooltip("操作成功");
+                window.setTimeout(function(){
+                  window.history.go(-2);
+                },2000);
+              }
+              else
+              {
+                DISystem.showTooltip(data.msg);
+              }
+            },
+            error:function(xhr,status,err){
+              DISystem.showTooltip("发生异常");
+            },
+          });
+      });
+      function getParam()
+      {
+        var param = [];
+        var inputs = $("input.di_param_name_input");
+        //inputs.forEach(function(item,index){
+        for(var i=0;i<inputs.length;i++)
+        {
+          var item = inputs[i];
+          var value = item.value.replace(/ /g,"");
+          if(value!="")
+          {
+            param.push({name:value,intro:$(item).next().val()});
+          }
+        }
+        return param;
+      }
     });
 
 block content
-  article
+  //- var _di=di||{}
+  article(data-pid=projectId,data-did=datainterface?datainterface._id:"-1")
     div
       div.di_input
-        input(type='text',placeHolder="接口格式")
+        input#di_name(type='text',placeHolder="接口名称",data-need="true",value=datainterface?datainterface.name:"")
       div.di_input
-        input(type='text',placeHolder="接口说明")
+        input#di_format(type='text',placeHolder="接口格式",data-need="true",value=datainterface?datainterface.format:"")
+      div.di_input
+        input#di_intro(type='text',placeHolder="接口说明",value=datainterface?datainterface.intro:"")
       div.di_method
-        a GET
-        a POST
-        a PUT
-        a DELETE
+        a(class=datainterface?((datainterface.method||'GET')=='GET'?"method-selected":""):"") GET
+        a(class=datainterface?((datainterface.method||'GET')=='POST'?"method-selected":""):"") POST
+        a(class=datainterface?((datainterface.method||'GET')=='PUT'?"method-selected":""):"") PUT
+        a(class=datainterface?((datainterface.method||'GET')=='DELETE'?"method-selected":""):"") DELETE
       div.di_param
-        div.di_param_field
-          input(type='text',placeHolder='参数')
+        if datainterface
+          each val in datainterface.params
+            div.di_param_field
+              input.di_param_name_input(type='text',placeHolder='参数',value=val.name)
+              &nbsp
+              input(type='text',placeHolder='参数说明',value=val.intro)
+              &nbsp;
+              a.a_btn_delete
+        else
+          input.di_param_name_input(type='text',placeHolder='参数',value=val.name)
           &nbsp
-          input(type='text',placeHolder='参数说明')
+          input(type='text',placeHolder='参数说明',value=val.intro)
           &nbsp;
           a.a_btn_delete
         a.di_add_param 添加参数
       div.di_retContent
-        textarea(rows=8,placeHolder="返回值")
+        textarea(rows=8,placeHolder="返回值")=datainterface?JSON.stringify(datainterface.retContent):""
         div.di_retContent_field

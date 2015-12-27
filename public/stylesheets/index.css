@@ -1,3 +1,16 @@
+body
+{
+  overflow:hidden;
+}
+article
+{
+  margin-top: 64px;
+  height:calc(100% - 64px);
+}
+.di_toolbar_back
+{
+  display: none;
+}
 ul
 {
 
@@ -36,4 +49,19 @@ li::after
   right: 0px;
   bottom: 0px;
   background: #ddd;
+}
+#di_new_project::after
+{
+  border:none;
+  width: 0px;
+}
+#di_new_project > a
+{
+  background: #22aadd;
+  padding: 10px;
+  color: white;
+  text-align: center;
+  width: 100px;
+  border-radius: 8px;
+  margin: auto;
 }

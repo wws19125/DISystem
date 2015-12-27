@@ -20,6 +20,8 @@
 */
 var mongodb = require("./db");
 var util = require("./util");
+var test = require('assert');
+var COLNAME = "datainterfaces";
 
 function DataInterface(di)
 {
@@ -68,22 +70,55 @@ DataInterface.save = function(di,callback){
       mongodb.close();
       return callback({reason:"open error",error:err,status:-1});
     }
-    db.collection("datainterfaces",function(err,collection){
+    db.collection(COLNAME,function(err,collection){
       if(err)
       {
-        mongodb.close();
-        return callback({reason:"open error",error:err,status:-1});
+        return callback({reason:"open db error",error:err,status:-1});
       }
       collection.insert(di,{safe: true}, function(err, di){
-          callback(err,di);
-          mongodb.close();
+          callback(err?{reason:"新建失败",error:err}:err,di);
       });
     });
   });
 };
-DataInterface.getById = function(_id,callback)
-{
 
+DataInterface.removeById = function(_id,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({reason:"open db error",error:err});
+    }
+    db.collection(COLNAME,function(err,collection){
+      if(err)
+      {
+        return callback({reason:"open collection error",error:err});
+      }
+      collection.remove({_id:_id},function(err,res){
+        callback(err?{reason:"删除失败",error:err}:err,res);
+      });
+    });
+  });
+};
+
+DataInterface.getById = function(diId,callback)
+{
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({reason:"open db error",error:err});
+    }
+    db.collection(COLNAME,function(err,collection){
+      if(err)
+      {
+        return callback({reason:"getById:open collection error",error:err});
+      }
+      collection.find({_id:diId}).limit(1).next(function(err, doc){
+        callback(err?{reason:"查询失败",error:err}:err,doc);
+      });
+    });
+  });
 }
 
 DataInterface.getByProjectId = function(projectId,callback)
@@ -92,15 +127,52 @@ DataInterface.getByProjectId = function(projectId,callback)
     if(err)
     {
       mongodb.close();
-      return callback({reason:"open error",error:err,status:-1});
+      return callback({reason:"open error",error:err});
     }
-    db.collection("datainterfaces",function(err,collection){
+    db.collection(COLNAME,function(err,collection){
       if(err)
       {
-        //mongodb.close();
         return callback({reason:"open collection error",error:err,status:-1});
       }
-      collection.find({projectId:projectId},{_id:0}).toArray(callback);
+      collection.find({projectId:projectId}).toArray(callback);
     });
   });
 }
+
+DataInterface.update = function(di,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({reason:"open error",error:err});
+    }
+    db.collection(COLNAME,function(err,collection){
+      if(err)
+      {
+        return callback({reason:"open collection error",error:err,status:-1});
+      }
+      collection.replaceOne({_id:di._id},di,function(err,result){
+          return callback(err?{reason:"update: insert error",error:err}:err,result);
+      });
+    });
+  });
+};
+
+DataInterface.changeStatus = function(di,status,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({reason:"open error",error:err});
+    }
+    db.collection(COLNAME,function(err,collection){
+      if(err)
+      {
+        return callback({reason:"open collection error",error:err,status:-1});
+      }
+      collection.updateOne({_id:di._id},{$set:{status:status}},function(err,result){
+          return callback(err?{reason:"delete: insert error",error:err}:err,result);
+      });
+    });
+  });
+};

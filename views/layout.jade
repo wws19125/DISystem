@@ -11,7 +11,8 @@ html
   body
     header.di_toolbar
       nav.di_toolbar_navbar
-        a.di_toolbar_back(href="javascript:window.history.go(-1)")
-        a(href="javascript:window.history.go(0)").di_toolbar_title=title
-        a.di_toolbar_right_menu(href="#")
+        a.di_toolbar_back(href="javascript:DISystem.goBack()")
+        a.di_toolbar_title=title
+        a.di_toolbar_right_menu.di_toolbar_right(href="#")
+    a.di_tooltip 提示
     block content

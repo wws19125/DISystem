@@ -56,27 +56,15 @@ router.get('/', function(req, res, next) {
       res.render('index',{ title :"DISystem",data:data});
     }
   });
-  /*
-  MongoClient.connect(url,function(err,db){
-    assert.equal(null,err);
-    console.log('Connected correctly to server.');
-    var cursor = db.collection('t').find();
-    //cursor.forEach(printjson);
-    cursor.each(function(err,doc){
-      assert.equal(err,null);
-      if(doc!=null)
-      {
-        //console.log(doc);
-        db.close();
-      }
-    });
-  });
-  */
 });
 
+/* GET interface detail page. */
 router.get('/:projectId/detail',function(req,res,next){
     //sDataInterface.getByProjectId(req.params.projectId,function(error,data){});
     res.render('diDetail',{title:"接口详细",projectId:req.params.projectId});
 });
 
+router.get('/project/new',function(req,res,next){
+  res.render('projects/edit',{title:"新建项目"});
+});
 module.exports = router;
