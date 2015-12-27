@@ -127,6 +127,7 @@ $(function(){
           if(document.body.scrollTop>=offset){
             target.style.position = "fixed";
             dt.style.marginLeft = parseInt(margin)+215;
+            target.style.left=0;
           }
           else
           {
