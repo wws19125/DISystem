@@ -315,11 +315,12 @@ block content
               &nbsp;
               a.a_btn_delete
         else
-          input.di_param_name_input(type='text',placeHolder='参数',value=val.name)
-          &nbsp
-          input(type='text',placeHolder='参数说明',value=val.intro)
-          &nbsp;
-          a.a_btn_delete
+          div.di_param_field
+            input.di_param_name_input(type='text',placeHolder='参数')
+            &nbsp
+            input(type='text',placeHolder='参数说明')
+            &nbsp;
+            a.a_btn_delete
         a.di_add_param 添加参数
       div.di_retContent
         textarea(rows=8,placeHolder="返回值")=datainterface?JSON.stringify(datainterface.retContent):""

@@ -142,7 +142,8 @@ $(function(){
       $("aside").css("z-index",99).toggle();
     });
     $("aside").on("click","li",function(){
+      if($(".di_toolbar_right_menu").css("display")=="none")
+        return;
       $("aside").hide();
-
     });
 });
