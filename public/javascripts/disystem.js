@@ -34,6 +34,7 @@ DISystem.addRightMenu = function(identity,text,style,callback)
   a.css(style);
   $(".di_toolbar_navbar").append(a);
   DISystem.menuCallback[identity] = callback;
+  return a;
 }
 DISystem.goBack = function(){
   if(window.sessionStorage.getItem("root"))

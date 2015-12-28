@@ -4,6 +4,80 @@ block doctype
   doctype html
 
 block header
+  style.
+    article
+    {
+      height:calc(100% - 60px);
+      margin-top:60px;
+    }
+    article > div
+    {
+      width:90%;
+      margin:auto;
+      margin-bottom:10px;
+    }
+    input[type='text']
+    {
+      height:36px;
+      outline:none;
+      border:none;
+      border-bottom:1px solid #ccc;
+      width:90%;
+      margin:auto;
+      padding-left:2%;
+    }
+    .btn_new
+    {
+      height:30px;
+      width:100px;
+      text-align:center;
+      margin:auto;
+      margin-top:20px;
+      background:#22aadd;
+      color:white;
+      line-height:30px;
+      border-radius:5px;
+    }
+  script.
+    $(function(){
+      DISystem.hiddenMenu();
+      DISystem.addRightMenu("btn_store","保存",{"color":"white","top":"13.5px","right":"15px"},function(){
+        var sJson = {
+          _id:"-1",
+          name:$("#projectName").val(),
+          desc:$("#projectDesc").val()
+        };
+        if(sJson.name.replace(/ /g,"")=="")
+        {
+          DISystem.showTooltip("请填写完毕");
+          return;
+        }
+        $.ajax({
+          url:'/project/new',
+          method:'post',
+          data:sJson,
+          success:function(data){
+            if(data.code==200)
+            {
+              window.history.go(-1);
+            }
+          },
+          error:function(xhr,status,error){
 
+          },
+          complete:function(xhr,status){
+
+          }
+        });
+      });
+      $(".btn_new").on("click",function(){
+        $(".btn_store").click();
+      });
+    });
 block content
-  h1=title
+  article(data-pid=projectId?projectId:"-1")
+    div
+      input#projectName(type='text',name='projectName',placeHolder='项目名称')
+    div
+      input#projectDesc(type='text',name='projectDesc',placeHolder='项目介绍')
+    a.btn_new.di_pc_only 新建

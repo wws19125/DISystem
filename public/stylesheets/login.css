@@ -36,6 +36,7 @@ article > h1:first-child
   outline: none;
   border:none;
   border-bottom: solid 1px #ddd;
+  font-size: 13pt;
 }
 .di_btn_box
 {
@@ -69,4 +70,23 @@ article > h1:first-child
   border:solid 1px #ccc;
   box-shadow: 0 0 2px 2px #bbb;
   text-decoration: none;
+}
+/** 平台特性 **/
+@media screen and (min-width:600px)
+{
+  .di_login_containbox
+  {
+    width: 360px;
+    padding: 60px 0;
+  }
+  article > h1:first-child
+  {
+    padding:10% 0px 40px 0px;
+    letter-spacing: 4px;
+    font-size: 30pt;
+  }
+  .di_btn_box
+  {
+    width:320px;
+  }
 }
