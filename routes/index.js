@@ -60,7 +60,6 @@ router.get('/', function(req, res, next) {
 
 /* GET interface detail page. */
 router.get('/:projectId/detail',function(req,res,next){
-    //sDataInterface.getByProjectId(req.params.projectId,function(error,data){});
     res.render('diDetail',{title:"接口详细",projectId:req.params.projectId});
 });
 

@@ -52,6 +52,9 @@ DISystem.showTooltip = function(text){
     $(target).hide();
   },2000);
 };
+var DIStatus = {
+  DIStatusOK:200
+};
 $(function(){
   $(".di_toolbar_navbar").on("click",".di_toolbar_right",function(){
     for(var identity in DISystem.menuCallback)

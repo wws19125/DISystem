@@ -4,18 +4,64 @@ html
     meta(name='viewport',content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no')
     head
       title 欢迎登陆
+      link(rel="stylesheet",href="/stylesheets/disystem.css")
       link(rel='stylesheet',type='text/css' href='stylesheets/login.css')
+      script(type="text/javascript",src="/plugins/jquery.js")
+      script(type="text/javascript",src="/javascripts/disystem.js")
+      script.
+        $(function(){
+          $("a.di_btn").on("click",function(){
+            var _this = $(this);
+            var username = $("#txt_username").val();
+            var password = $("#txt_password").val();
+            if(!(username&&password))
+            {
+              DISystem.showTooltip("请检查您的输入");
+              return;
+            }
+            _this.hide();
+            $.ajax({
+              url:'/',
+              type:'post',
+              data:{
+                username:username,
+                password:password
+              },
+              success:function(data){
+                DISystem.showTooltip(data.msg);
+                if(data.code==DIStatus.DIStatusOK)
+                {
+                  window.setTimeout(function(){
+                    window.location.replace("/home");
+                  },1500);
+                }
+                else
+                  _this.show();
+              },
+              error:function(xhr,status,error){
+                console.log(error);
+                DISystem.showTooltip("发生异常");
+                _this.show();
+              },
+              complete:function(xhr,status)
+              {
+                
+              }
+            });
+          });
+        });
   body
     article
       h1 DISystem
+      a.di_tooltip(style="top:0px") 提示
       div.di_login_containbox
         div
           input(type='text',name='txt_username',id='txt_username',placeHolder='请输入用户名')
         div
-          input(type='password',name='txt_username',id='txt_username',placeHolder="请输入密码")
+          input(type='password',name='txt_password',id='txt_password',placeHolder="请输入密码")
       div.di_btn_box
         div
           input(type='checkbox',checked)
           a 记住我
         div
-          a.di_btn(href='/home') Login
+          a.di_btn(href='#') Login
