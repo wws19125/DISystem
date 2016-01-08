@@ -1,0 +1,15 @@
+extends ../layout.jade
+
+block doctype
+  doctype html
+
+block header
+  link(href='/stylesheets/manager/index.css',rel='stylesheet')
+block content
+  body
+    article
+      ul
+        li
+          a(href='/manager/user') 用户管理
+        li
+          a(href='/manager/project') 项目管理

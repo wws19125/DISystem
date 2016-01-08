@@ -1,0 +1,42 @@
+article
+{
+  padding-top: 64px;
+}
+li
+{
+  height:24px;
+  padding:5px;
+  padding-left:10%;
+  position:relative;
+}
+li::after
+{
+  content:"";
+  position:absolute;
+  height:1px;
+  width:92%;
+  background:#ccc;
+  right:3%;
+  display:block;
+  bottom:1px;
+}
+li::before
+{
+  content:"";
+  position:absolute;
+  height:0px;
+  width:0px;
+  left:6%;
+  bottom:10px;
+  display:block;
+  border-top:10px solid transparent;
+  border-bottom:10px solid transparent;
+  border-left:10px solid #22aadd;
+}
+li a
+{
+  width:100%;
+  display:block;
+  color:#333;
+  text-decoration:none;
+}

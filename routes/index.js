@@ -4,6 +4,7 @@ var router = express.Router();
 var assert = require('assert');
 var DataInterface = require('../modules/dataInterface.js');
 var Project = require('../modules/project.js');
+var errorStatus = require("../modules/diStatus");
 
 
 //var url = 'mongodb://localhost:27017/test';

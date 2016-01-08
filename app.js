@@ -16,6 +16,7 @@ var users = require('./routes/users');
 var auths = require('./routes/auths');
 var datainterfaces = require('./routes/dataInterfaces');
 var projects = require('./routes/projects');
+var managers = require('./routes/managers');
 
 var errorStatus = require('./modules/diStatus');
 
@@ -47,6 +48,8 @@ app.use(session({
 }));
 
 app.use(function(req, res, next) {
+  next();
+  return;
   if(req.path=="/")
   {
     if(req.session&&req.session.username)
@@ -83,6 +86,7 @@ app.use('/users', users);
 app.use('/home',homes);
 app.use('/di',datainterfaces);
 app.use('/project',projects);
+app.use('/manager',managers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
