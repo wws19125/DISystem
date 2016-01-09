@@ -4,7 +4,112 @@ block doctype
   doctype html
 
 block header
+  link(href="/stylesheets/manager/user.css",rel="stylesheet")
+  script.
+    $(function(){
+      $.ajax({
+        url:'/users',
+        method:'get',
+        success:function(data){
+          if(data.code==DIStatus.DIStatusOK)
+          {
+            var html = "";
+            data.data.forEach(function(item,index){
+              html += "<li data-uid='{0}'><a>{1}</a><a>重置密码</a><a>删除</a></li>".format(item._id,item.name);
+            });
+            $("ul").html(html);
+            html = undefined;
+          }
+        },
+        error:function(xhr,status,error){},
+        complete:function(xhr,status){}
+      });
+      DISystem.setMenuCallback(function(){
+        $(".toolbar_menu").toggle();
+      });
+      $(".toolbar_menu").on("click","a",function(){
+        $(".toolbar_menu").toggle();
+        if(this.classList.contains("menu_addUser"))
+        {
+          var html = "<div class='mask_div'>\
+                        <div>\
+                          <a>新建用户</a>\
+                          <input type='text' placeHolder='请输入用户名' id='txt_username'>\
+                          <input type='password' placeHolder='请输入密码' id='txt_password'>\
+                          <input type='password' placeHolder='请确认密码' id='txt_cpassword'>\
+                          <div>\
+                            <a>允许创建项目</a>\
+                            <a class='user_allowCreate user_Create'></a>\
+                          </div>\
+                          <a class='btn_ok'>确定</a>\
+                        </div>\
+                      </div>";
+          $("body").append(html);
+          $(".mask_div").on("click","a",function(){
+            if(this.classList.contains('btn_ok'))
+            {
+              var username = $("#txt_username").val();
+              var password = $("#txt_password").val();
+              var cpassword = $("#txt_cpassword").val();
+              if(!(username&&password&&cpassword))
+              {
+                DISystem.showTooltip("请检查输入");
+                return;
+              }
+              else
+              {
+                if(password!=cpassword)
+                {
+                  DISystem.showTooltip("密码不一致");
+                  return;
+                }
+              }
+              $.ajax({
+                url:'/users/new',
+                type:'post',
+                data:{
+                  username:username,
+                  password:password
+                },
+                success:function(data){
+                  DISystem.showTooltip(data.msg);
+                  if(data.code==DIStatus.DIStatusOK)
+                  {
+                    console.log(data);
+                  }
+                },
+                error:function(xhr,status,error)
+                {
 
+                }
+              });
+              $(".mask_div").remove();
+              return;
+            }
+            if(this.classList.contains("user_allowCreate"))
+            {
+              this.classList.remove("user_allowCreate");
+              this.classList.add("user_notallowCreate");
+            }
+            else
+              if(this.classList.contains("user_notallowCreate"))
+            {
+              this.classList.remove("user_notallowCreate");
+              this.classList.add("user_allowCreate");
+            }
+          });
+        }
+      });
+    });
 block content
   body
-    h1 abc
+    article
+      nav.toolbar_menu
+        a.menu_addUser 添加用户
+      div
+        ul
+          li
+            a 用户名
+            a 编辑
+            a 删除
+            a 重置密码

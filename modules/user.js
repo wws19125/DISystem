@@ -7,6 +7,8 @@ function User(user)
 {
   this.name = user.name;
   this.password = user.password;
+  this.authRole=user.authRole;
+  this.authProject = user.authProject;
 }
 
 module.exports = User;

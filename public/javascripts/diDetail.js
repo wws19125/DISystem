@@ -66,6 +66,10 @@ function getReturn(jsonData){
   };
 $(function(){
     //DISystem.displayMenu();
+    var backCount = window.history.length;
+    window.onhashchange = function(){
+      DISystem.goBack = function(){ window.history.go( backCount - window.history.length-1);};
+    };
     $.ajax({
       url:'/di/{0}/list-for-project'.format(document.querySelector("article").dataset.id),
       type:'get',

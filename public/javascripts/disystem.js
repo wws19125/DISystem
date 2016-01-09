@@ -37,13 +37,7 @@ DISystem.addRightMenu = function(identity,text,style,callback)
   return a;
 }
 DISystem.goBack = function(){
-  if(window.sessionStorage.getItem("root"))
-  {
-    window.history.go(-1);
-  }
-  else {
-    window.location.replace("/");
-  }
+  window.history.back();
 };
 DISystem.showTooltip = function(text){
   var target = document.querySelector(".di_tooltip");
