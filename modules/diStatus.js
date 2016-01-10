@@ -13,6 +13,7 @@ var status = {
   outterErrorNotLoginMsg:"非法用户，请先登录",
   outterErrorLogin:402,
   outterErrorLoginMsg:"登陆失败",
+  outterErrorAreadyExist: 403, //数据重复
 
   otherError: 500 //未知原因
 };

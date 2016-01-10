@@ -88,9 +88,11 @@ article li a:nth-child(n+3)::before
   border:2px solid #ccc;
   margin: auto;
   margin-top:20%;
+  /*
   margin-top: -moz-calc(50% - 70px);
   margin-top: -webkit-calc(50% - 70px);
   margin-top: calc(50% - 70px);
+  */
   border-radius: 3px;
 }
 .mask_div > div >a:nth-of-type(1)

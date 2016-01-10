@@ -7,6 +7,73 @@ block header
   link(href="/stylesheets/manager/user.css",rel="stylesheet")
   script.
     $(function(){
+      $("ul").on("click","li",function(e){
+        var sdata = {
+          data:{
+            _id:this.dataset.uid,
+            username:this.dataset.name
+          },
+          url:"",
+          type:""
+        };
+        var target = e.srcElement||e.target;
+        var _this = $(this);
+        if(/授权/.test(target.innerHTML))
+        {
+          sdata.url = "/users/authRole";
+          sdata.type= "put";
+          var authRole = this.dataset.auth;
+          if(/取消/.test(target.innerHTML))
+          {
+            sdata.data.authRole = authRole&0x0d;
+            sdata.success=function(data){
+              _this.html(_this.html().replace("green","red"));
+              _this.html(_this.html().replace("取消",""));
+            };
+          }
+          else
+          {
+            sdata.data.authRole = authRole|0x02;
+            sdata.success=function(data){
+              _this.html(_this.html().replace("red","green"));
+              _this.html(_this.html().replace("授权","取消授权"));
+            };
+          }
+
+        }
+        else
+          if(/密码/.test(target.innerHTML))
+          {
+            sdata.url = "/users/resetPassword";
+            sdata.type="put";
+            sdata.success=function(){}
+          }
+          else
+            if(/删除/.test(target.innerHTML))
+            {
+              sdata.url="/users/delete";
+              sdata.type="delete";
+              sdata.success=function(data){
+                _this.remove();
+              }
+            }
+            $.ajax({
+              url:sdata.url,
+              type:sdata.type,
+              data:sdata.data,
+              success:function(data){
+                DISystem.showTooltip(data.msg);
+                if(data.code==DIStatus.DIStatusOK)
+                {
+                  sdata.success(data);
+                }
+              },
+              error:function(xhr,status,error){
+                DISystem.showTooltip("操作异常!");
+              },
+              complete:function(xhr,status){}
+            });
+      });
       $.ajax({
         url:'/users',
         method:'get',
@@ -15,7 +82,7 @@ block header
           {
             var html = "";
             data.data.forEach(function(item,index){
-              html += "<li data-uid='{0}'><a>{1}</a><a>重置密码</a><a>删除</a></li>".format(item._id,item.name);
+              html += "<li data-uid='{0}' data-name='{1}' data-auth='{4}'><a>{1}</a><a style='color:{2}'>{3}授权</a><a>重置密码</a><a>删除</a></li>".format(item._id,item.username,((item.authRole&0x02)==0?"red":"green"),((item.authRole&0x02)==0?"":"取消"),item.authRole);
             });
             $("ul").html(html);
             html = undefined;
@@ -51,6 +118,7 @@ block header
               var username = $("#txt_username").val();
               var password = $("#txt_password").val();
               var cpassword = $("#txt_cpassword").val();
+
               if(!(username&&password&&cpassword))
               {
                 DISystem.showTooltip("请检查输入");
@@ -69,18 +137,22 @@ block header
                 type:'post',
                 data:{
                   username:username,
-                  password:password
+                  password:password,
+                  auth:document.querySelector(".user_Create").classList.contains("user_allowCreate")?1:0
                 },
                 success:function(data){
                   DISystem.showTooltip(data.msg);
                   if(data.code==DIStatus.DIStatusOK)
                   {
-                    console.log(data);
+                    var item = data.data;
+                    var html = "<li data-uid='{0}' data-name='{1}'  data-auth='{4}'><a>{1}</a><a style='color:{2}'>{3}授权</a><a>重置密码</a><a>删除</a></li>".format(item._id,item.username,((item.authRole&0x02)==0?"red":"green"),((item.authRole&0x02)==0?"":"取消"),item.authRole);
+                    $("ul").append(html);
+                    html = undefined;
                   }
                 },
                 error:function(xhr,status,error)
                 {
-
+                  DISystem.showTooltip("操作失败");
                 }
               });
               $(".mask_div").remove();

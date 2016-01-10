@@ -12,7 +12,7 @@ router.get('/',function(req,res,next){
 router.post('/',function(req,res,next){
   var username = req.body.username;
   var password = req.body.password;
-  User.findUser({name:username,password:password},function(error,user){
+  User.findUser({username:username,password:password},function(error,user){
     if(error)
     {
       res.json({code:error.code,msg:error.msg});
