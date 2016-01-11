@@ -68,7 +68,7 @@ User.findUser = function(user,callback)
       {
         return callback({msg:errorStatus.innerErrorMsg,code:errorStatus.innerErrorOpenCollection,error:err});
       }
-      collection.find(user).limit(1).next(function(err,doc){
+      collection.find(user,{password:0}).limit(1).next(function(err,doc){
         callback(err?{msg:errorStatus.innerErrorMsg,code:errorStatus.innerErrorOperationCollection,error:err}:err,doc);
       });
     });
@@ -153,3 +153,35 @@ User.authRole = function(user,callback)
     });
   });
 }
+
+/// check authority
+User.checkProjectAuth = function(user){
+  var auth = {
+    canAccessManager:!!(user.authRole&0x4),  //是有管理权限
+    canCreateProject:!!(user.authRole&0x20), //创建项目权限
+
+    canAccessProject:false, //查看项目
+    canAuthProject:false, //授权项目
+    canEditProject:false, //编辑项目
+    canDeleteProject:false, //删除项目
+
+    canCreateInterface:false, //创建接口
+    canEditInterface:false, // 编辑接口
+    canDeleteInterface:false, //删除接口
+    canDownPdf:false //下载接口
+
+  };
+  if(user.authProject)
+  {
+    auth.canAccessProject = !!(user.authProject&0x80);
+    auth.canAuthProject = !!(user.authProject&0x40);
+    auth.canEditProject = !!(user.authProject&0x20);
+    auth.canDeleteProject = !!(user.authProject&0x10);
+
+    auth.canCreateInterface = !!(user.authProject&0x08);
+    auth.canEditInterface = !!(user.authProject&0x04);
+    auth.canDeleteInterface = !!(user.authProject&0x02);
+    auth.canDownPdf = !!(user.authProject&0x01);
+  }
+  return auth;
+};

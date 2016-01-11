@@ -5,6 +5,7 @@ var assert = require('assert');
 var DataInterface = require('../modules/dataInterface.js');
 var Project = require('../modules/project.js');
 var errorStatus = require("../modules/diStatus");
+var User = require('../modules/user');
 
 
 //var url = 'mongodb://localhost:27017/test';
@@ -47,10 +48,12 @@ router.post('/update',function(req,res,next){
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  Project.get(function(err,data){
+  Project.get(req.session.user,function(err,data){
     if(err)
     {
       res.render('index', { title: 'DISystem' });
+      err.mode==0;
+      next(err);
     }
     else
     {

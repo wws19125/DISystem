@@ -77,7 +77,13 @@ block header
 block content
   article(data-pid=projectId?projectId:"-1")
     div
-      input#projectName(type='text',name='projectName',placeHolder='项目名称')
+      if project
+        input#projectName(type='text',name='projectName',placeHolder='项目名称',value=project.name)
+      else
+        input#projectName(type='text',name='projectName',placeHolder='项目名称')
     div
-      input#projectDesc(type='text',name='projectDesc',placeHolder='项目介绍')
+      if project
+        input#projectDesc(type='text',name='projectDesc',placeHolder='项目介绍',value=project.desc)
+      else
+        input#projectDesc(type='text',name='projectDesc',placeHolder='项目介绍')
     a.btn_new.di_pc_only 新建

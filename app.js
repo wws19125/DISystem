@@ -48,11 +48,20 @@ app.use(session({
 }));
 
 app.use(function(req, res, next) {
-  next();
-  return;
+
+  /*********************************/
+  var user = {
+    _id: '7894c9c4-f0e2-2be3-d92d-d149c83610d0',
+    username: 'admin',
+    authRole: '3'
+  };
+  req.session.user = user;
+  /*********************************/
+
   if(req.path=="/")
   {
-    if(req.session&&req.session.username)
+    // legal user
+    if(req.session&&req.session.user)
     {
       res.redirect("/home");
     }
@@ -64,7 +73,7 @@ app.use(function(req, res, next) {
   {
     var _session = req.session;
     ///没有登陆
-    if(!_session.username)
+    if(!_session.user)
     {
       //ajax
       if(req.get("X-Requested-With"))
@@ -76,6 +85,24 @@ app.use(function(req, res, next) {
       }
     }
     else {
+      if(/^(\/manager)/.test(req.path))
+      {
+        if(req.session.user)
+        {
+          if(!!(req.session.user.authRole&0x4))
+            return next();
+          //ajax
+          if(req.get("X-Requested-With"))
+          {
+            res.json({code:errorStatus.authorityErrorAccess,msg:errorStatus.authorityErrorAccessMsg});
+          }
+          else {
+            res.status(403).send("<h1 style='width:100%;text-align:center;margin-top:20%;'>抱歉,访问出错,错误代码:{0}</h1>".format(errorStatus.authorityErrorAccess));
+          }
+          return;
+          //res.end();
+        }
+      }
       next();
     }
   }

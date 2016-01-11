@@ -23,15 +23,34 @@ block header
       DISystem.addRightMenu("btn_new_project","新建",{"color":"white","top":"13.5px","right":"15px"},function(){
         window.location.href="/home/project/new";
       });
+      $("li div").on("click","a",function(e){
+        e.stopPropagation();
+        switch(parseInt(this.dataset.index))
+        {
+          case 2:
+            var cf = window.confirm("确定删除么？");
+            break;
+          default:
+            break;
+        }
+      });
     });
 
 block content
   body
     article
       ul
-        each val, index in data
+        each val, index in (data.projects)
           li(id=val._id)
-            a(id=val._id)=val.name
+            div
+              a(id=val._id)=val.name
+              if (data.auths[val._id]&0x40)
+                a(style="color:green;",data-index="0",href="/project/"+val._id+"/authority") 授权
+              if (data.auths[val._id]&0x20)
+                a(data-index="1",href="/project/"+val._id+"/update") 修改
+              if (data.auths[val._id]&0x10)
+                a(style="color:red;",data-index="2") 删除
             a=val.desc
+
         li#di_new_project.di_pc_only
           a 新建项目

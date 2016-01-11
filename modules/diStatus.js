@@ -15,6 +15,12 @@ var status = {
   outterErrorLoginMsg:"登陆失败",
   outterErrorAreadyExist: 403, //数据重复
 
-  otherError: 500 //未知原因
+  authorityError: 500, //权限不够
+  authorityErrorAccess: 501, //访问权限不足,
+  authorityErrorAccessMsg: "访问权限不足",
+  authorityErrorOperation: 502, //操作权限不足
+  authorityErrorOperationMsg: "操作权限不足",
+
+  otherError: 600 //未知原因
 };
 module.exports = status;

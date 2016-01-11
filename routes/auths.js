@@ -22,7 +22,7 @@ router.post('/',function(req,res,next){
       var code = errorStatus.ok;
       var msg = "登陆成功";
       if(user){
-        req.session.username=user.name;
+        req.session.user=user;
       }
       else
       {
