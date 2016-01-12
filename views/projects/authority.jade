@@ -4,6 +4,48 @@ block doctype
   doctype html
 
 block header
-
+  link(href="/stylesheets/projects/authority.css",rel="stylesheet")
+  script.
+    $(function(){
+      var li = "<li>\
+                  <a>{0}</a>\
+                  <div>\
+                    <a style='background:{1}'>RP</a>\
+                    <a style='background:{2}'>EP</a>\
+                    <a style='background:{3}'>AP</a>\
+                    <a style='background:{4}'>AD</a>\
+                    <a style='background:{5}'>ED</a>\
+                    <a style='background:{6}'>RD</a>\
+                    <a style='background:{7}'>DD</a>\
+                  </div>\
+                </li>"
+      $.ajax({
+        url:window.location.pathname,
+        type:'get',
+        success:function(data){
+          //DISystem.showTooltip(data.msg);
+          if(data.code==200)
+          {
+            var html = "";
+            data.data.projects.forEach(function(item,index){
+              html += li.format(data.data.users[item.uid],!!(item.authProject&0x40)?"#22aadd":"gray",!!(item.authProject&0x20)?"#22aadd":"gray",!!(item.authProject&0x10)?"#22aadd":"gray",!!(item.authProject&0x08)?"#22aadd":"gray",!!(item.authProject&0x04)?"#22aadd":"gray",!!(item.authProject&0x02)?"#22aadd":"gray",!!(item.authProject&0x01)?"#22aadd":"gray");
+            });
+            $("ul").html(html);
+            html = "";
+          }
+        },
+        error:function(xhr,status,err){
+          DISystem.showTooltip("操作失败");
+        }
+      });
+      $("ul").on("click","li",function(e){
+        alert("授权用户");
+      });
+    });
 block content
-  h1 abc
+  article
+    div.search_box
+      input(type='text',placeHolder="搜索添加用户")
+      a.btn_search 搜索
+    div
+      ul

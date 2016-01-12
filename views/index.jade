@@ -25,13 +25,30 @@ block header
       });
       $("li div").on("click","a",function(e){
         e.stopPropagation();
-        switch(parseInt(this.dataset.index))
+        var _this = this;
+        if(parseInt(this.dataset.index)==2)
         {
-          case 2:
-            var cf = window.confirm("确定删除么？");
-            break;
-          default:
-            break;
+          if(!this.dataset.pid)return;
+          var cf = window.confirm("确定删除么？");
+          if(cf)
+          {
+            $.ajax({
+              type:'delete',
+              url:'/project/{0}/delete'.format(_this.dataset.pid),
+              success:function(data){
+                DISystem.showTooltip(data.msg);
+                if(data.code==200)
+                {
+                  $(_this).parent().parent().remove();
+                  //$("li#{0}".format(_this.dataset.pid)).remove();
+                }
+              },
+              error:function(xhr,status,error)
+              {
+                DISystem.showTooltip("提交失败");
+              }
+            });
+          }
         }
       });
     });
@@ -49,7 +66,7 @@ block content
               if (data.auths[val._id]&0x20)
                 a(data-index="1",href="/project/"+val._id+"/update") 修改
               if (data.auths[val._id]&0x10)
-                a(style="color:red;",data-index="2") 删除
+                a(style="color:red;",data-index="2",data-pid=val._id) 删除
             a=val.desc
 
         li#di_new_project.di_pc_only

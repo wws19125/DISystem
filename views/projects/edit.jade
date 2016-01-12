@@ -52,14 +52,26 @@ block header
           DISystem.showTooltip("请填写完毕");
           return;
         }
+        var url = '/project/new';
+        var type='post';
+        var target = document.querySelector(".btn_new");
+        if(target.dataset.pid)
+        {
+          url = window.location.pathname;
+          sJson._id = target.dataset.pid;
+          type='put';
+        }
         $.ajax({
-          url:'/project/new',
-          method:'post',
+          url:url,
+          type:type,
           data:sJson,
           success:function(data){
+            DISystem.showTooltip(data.msg);
             if(data.code==200)
             {
-              window.history.go(-1);
+              window.setTimeout(function(){
+                DISystem.goBack();
+              },2000);
             }
           },
           error:function(xhr,status,error){
@@ -86,4 +98,7 @@ block content
         input#projectDesc(type='text',name='projectDesc',placeHolder='项目介绍',value=project.desc)
       else
         input#projectDesc(type='text',name='projectDesc',placeHolder='项目介绍')
-    a.btn_new.di_pc_only 新建
+    if project
+      a.btn_new.di_pc_only(data-pid=project._id) 保存
+    else
+      a.btn_new.di_pc_only 新建

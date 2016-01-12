@@ -96,15 +96,15 @@ Project.update = function(project,callback){
     if(err)
     {
       mongodb.close();
-      return callback(err);
+      return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
     }
     db.collection(COLNAME,function(err,collection){
       if(err)
       {
-        return callback({reason:"save: open collection error",error:err});
+        return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenCollection,error:err});
       }
-      collection.insert(project,{safe: true}, function(err, di){
-          callback(err?{reason:"save: 新建失败",error:err}:err,di);
+      collection.findOneAndUpdate({_id:project._id},{$set:{name:project.name,desc:project.desc}}, function(err, di){
+          callback(err?{msg:"修改失败",code:diStatus.innerErrorOpenCollection,error:err}:err,di);
       });
     });
   });
@@ -124,6 +124,77 @@ Project.getOneProject = function(project,callback){
       }
       collection.find(project).limit(1).next(function(err, doc){
           callback(err?{msg:"查询失败",code:diStatus.innerErrorOperationCollection,error:err}:err,doc);
+      });
+    });
+  });
+};
+Project.remove = function(project_id,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
+    }
+    db.collection(RCOLNAME,function(err,rcollection){
+      if(err)
+      {
+        return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+      }
+      rcollection.remove({pid:project_id},function(err, result){
+        if(err)
+        {
+          return callback({msg:"删除失败",code:diStatus.innerErrorOperationCollection,error:err},result);
+        }
+        else {
+          db.collection(RCOLNAME,function(err,collection){
+            if(err)
+            {
+              return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+            }
+            collection.remove({_id:project_id},function(err, result){
+              callback(err?{msg:"删除失败",code:diStatus.innerErrorOperationCollection,error:err}:err,result);
+            });
+          });
+        }
+      });
+    });
+  });
+}
+Project.getAuth = function(project_id,user,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
+    }
+    db.collection(RCOLNAME,function(err,rcollection){
+      if(err)
+      {
+        return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+      }
+      /*
+      rcollection.find({pid:project_id}).toArray(function(err,res){
+        callback(err?{msg:"查询失败",code:diStatus.innerErrorOpenCollection,error:err}:err,res);
+      });
+      */
+      rcollection.aggregate([{$match:{pid:project_id}},{$project:{projects:{uid:"$uid",authProject:"$authProject"},pid:"$pid",uid:"$uid"}},{$group:{_id:"$pid",projects:{$push:"$projects"},users:{$push:"$uid"}}}],function(err,result){
+        //console.log(JSON.stringify(result));
+        if(err)
+        {
+          return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+        }
+        db.collection("users",function(err,collection){
+          collection.find({_id:{$in:result[0].users}},{password:0}).toArray(function(err,docs){
+            var res = {};
+            res.projects = result[0].projects;
+            res.users = {};
+            docs.forEach(function(item,index){
+              res.users[item._id] = item.username;
+            });
+            return callback(err?{msg:"查询失败",code:diStatus.innerErrorOpenCollection,error:err}:err,res);
+          });
+        });
+        //return callback(null,null);
       });
     });
   });

@@ -20,8 +20,26 @@ router.post('/new',function(req,res,next){
   });
 });
 
+/// authority
+/// authority to user
 router.get('/:projectId/authority',function(req,res,next){
-  res.render('projects/authority',{title:"项目授权"});
+  if(req.get("X-Requested-With"))
+  {
+    Project.getAuth(req.params.projectId,req.session.user,function(error,users){
+      if(error)
+      {
+        res.json({code:error.code,msg:error.msg});
+        error.mode =0;
+        next(error);
+      }
+      else {
+        res.json({code:DIStatus.ok,msg:"操作成功",data:users});
+      }
+    });
+    //res.json({code:200,msg:"成功",data:""});
+  }
+  else
+    res.render('projects/authority',{title:"项目授权"});
 });
 
 router.get('/:projectId/update',function(req,res,next){
@@ -41,11 +59,32 @@ router.get('/:projectId/update',function(req,res,next){
 });
 
 router.put('/:projectId/update',function(req,res,next){
-  res.json({msg:"sss",code:200});
+  var project = req.body;
+  Project.update(project,function(error,result){
+    if(error)
+    {
+      res.json({code:error.code,msg:error.msg});
+      error.mode =0;
+      next(error);
+    }
+    else {
+      res.json({code:DIStatus.ok,msg:"操作成功"});
+    }
+  });
 });
 
 router.delete('/:projectId/delete',function(req,res,next){
-  res.json({msg:"sss",code:200});
+  Project.remove(req.params.projectId,function(error,result){
+    if(error)
+    {
+      res.json({code:error.code,msg:error.msg});
+      error.mode =0;
+      next(error);
+    }
+    else {
+      res.json({code:DIStatus.ok,msg:"删除成功"});
+    }
+  });
 });
 
 module.exports = router;
