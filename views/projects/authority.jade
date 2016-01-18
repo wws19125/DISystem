@@ -7,18 +7,46 @@ block header
   link(href="/stylesheets/projects/authority.css",rel="stylesheet")
   script.
     $(function(){
-      var li = "<li>\
-                  <a>{0}</a>\
+      var li = "<li data-uid='{0}' data-auth='{1}'>\
+                  <a>{2}</a>\
                   <div>\
-                    <a style='background:{1}'>RP</a>\
-                    <a style='background:{2}'>EP</a>\
-                    <a style='background:{3}'>AP</a>\
-                    <a style='background:{4}'>AD</a>\
-                    <a style='background:{5}'>ED</a>\
-                    <a style='background:{6}'>RD</a>\
-                    <a style='background:{7}'>DD</a>\
+                    <a style='background:{3}'>RP</a>\
+                    <a style='background:{4}'>AP</a>\
+                    <a style='background:{5}'>EP</a>\
+                    <a style='background:{6}'>AD</a>\
+                    <a style='background:{7}'>ED</a>\
+                    <a style='background:{8}'>RD</a>\
+                    <a style='background:{9}'>DD</a>\
                   </div>\
-                </li>"
+                </li>";
+      $(".btn_search").on("click",function(){
+        var username = $("input").val();
+        if(!username)return;
+        $.ajax({
+          url:window.location.pathname.replace(/authority/,"{0}/searchUser".format(username)),
+          type:"get",
+          success:function(data){
+            if(data.code!=200)
+            {
+              DISystem.showTooltip(data.msg);
+            }
+            else
+            {
+              $("input").val("");
+              if(data.data.code!=200)
+              {
+                DISystem.showTooltip(data.data.msg);
+                return;
+              }
+              var item = data.data.user;
+              $("ul").prepend(li.format(item._id,0,item.username,"gray","gray","gray","gray","gray","gray","gray"));
+            }
+          },
+          error:function(){
+            DISystem.showTooltip("发生异常，请稍后重试");
+          }
+        });
+      });
       $.ajax({
         url:window.location.pathname,
         type:'get',
@@ -28,7 +56,7 @@ block header
           {
             var html = "";
             data.data.projects.forEach(function(item,index){
-              html += li.format(data.data.users[item.uid],!!(item.authProject&0x40)?"#22aadd":"gray",!!(item.authProject&0x20)?"#22aadd":"gray",!!(item.authProject&0x10)?"#22aadd":"gray",!!(item.authProject&0x08)?"#22aadd":"gray",!!(item.authProject&0x04)?"#22aadd":"gray",!!(item.authProject&0x02)?"#22aadd":"gray",!!(item.authProject&0x01)?"#22aadd":"gray");
+              html += li.format(item.uid,item.authProject,data.data.users[item.uid],!!(item.authProject&0x80)?"#22aadd":"gray",!!(item.authProject&0x40)?"#22aadd":"gray",!!(item.authProject&0x20)?"#22aadd":"gray",!!(item.authProject&0x08)?"#22aadd":"gray",!!(item.authProject&0x04)?"#22aadd":"gray",!!(item.authProject&0x02)?"#22aadd":"gray",!!(item.authProject&0x01)?"#22aadd":"gray");
             });
             $("ul").html(html);
             html = "";
@@ -39,7 +67,73 @@ block header
         }
       });
       $("ul").on("click","li",function(e){
-        alert("授权用户");
+        var self = this;
+        var uid = this.dataset.uid;
+        var auth = this.dataset.auth;
+        if(!uid||!auth)return;
+        auth = parseInt(auth);
+        var authorityDiv = "<div style='' class='authorityDiv'>\
+                              <div>\
+                                <a class='{0}' data-auth='128'>查看项目</a>\
+                                <a class='{1}' data-auth='64'>授权项目</a>\
+                                <a class='{2}' data-auth='32'>编辑项目</a>\
+                                <a class='{3}' data-auth='8'>添加接口</a>\
+                                <a class='{4}' data-auth='4'>编辑接口</a>\
+                                <a class='{5}' data-auth='2'>删除接口</a>\
+                                <a class='{6}' data-auth='1'>下载接口</a>\
+                                </div>\
+                              <a class='btn_auth'>确定</a>\
+                            </div>";
+        $("body").append("<div class='authorityDiv_mask'>{0}</div>".format(authorityDiv.format(!!(auth&0x80)?"activity_auth":"unactivity_auth",!!(auth&0x40)?"activity_auth":"unactivity_auth",!!(auth&0x20)?"activity_auth":"unactivity_auth",!!(auth&0x08)?"activity_auth":"unactivity_auth",!!(auth&0x04)?"activity_auth":"unactivity_auth",!!(auth&0x02)?"activity_auth":"unactivity_auth",!!(auth&0x01)?"activity_auth":"unactivity_auth")));
+        $(".authorityDiv_mask").on("click",function(e){
+          var target = e.srcElement||e.target;
+          if(target.classList.contains("authorityDiv_mask"))
+          {
+            $(this).remove();
+          }
+          if(target.nodeName=="A")
+          {
+            if(target.classList.contains("btn_auth"))
+            {
+                var auths = 0;
+                $(".activity_auth").each(function(index,item){
+                  auths += parseInt(item.dataset.auth);
+                });
+                $.ajax({
+                  url:window.location.pathname,
+                  type:'put',
+                  data:{
+                    uid:uid,
+                    auths:auths
+                  },
+                  success:function(data){
+                    DISystem.showTooltip(data.msg);
+                    if(data.code==200)
+                    {
+                      var item = data.data;
+                      var name = self.querySelector("a").innerHTML;
+                      $(".authorityDiv_mask").remove();
+                      $(self).replaceWith(li.format(item.uid,item.authProject,name,!!(item.authProject&0x80)?"#22aadd":"gray",!!(item.authProject&0x40)?"#22aadd":"gray",!!(item.authProject&0x20)?"#22aadd":"gray",!!(item.authProject&0x08)?"#22aadd":"gray",!!(item.authProject&0x04)?"#22aadd":"gray",!!(item.authProject&0x02)?"#22aadd":"gray",!!(item.authProject&0x01)?"#22aadd":"gray"));
+                    }
+                  },
+                  error:function(xhr,status,err){}
+                });
+            }
+            else
+            {
+              if(target.classList.contains("activity_auth"))
+              {
+                target.classList.remove("activity_auth");
+                target.classList.add("unactivity_auth");
+              }
+              else
+              {
+                target.classList.remove("unactivity_auth");
+                target.classList.add("activity_auth");
+              }
+            }
+          }
+        });
       });
     });
 block content

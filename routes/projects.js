@@ -21,7 +21,7 @@ router.post('/new',function(req,res,next){
 });
 
 /// authority
-/// authority to user
+/// authority to user, just obtain data
 router.get('/:projectId/authority',function(req,res,next){
   if(req.get("X-Requested-With"))
   {
@@ -40,6 +40,40 @@ router.get('/:projectId/authority',function(req,res,next){
   }
   else
     res.render('projects/authority',{title:"项目授权"});
+});
+
+/// authority
+/// authority for users, update db
+router.put('/:projectId/authority',function(req,res,next){
+  Project.updateAuth(req.session.user,{uid:req.body.uid,authProject:req.body.auths,pid:req.params.projectId},function(error,auths){
+    if(error)
+    {
+      res.json({code:error.code,msg:"授权失败"});
+      error.mode =0;
+      next(error);
+    }
+    else {
+      res.json({code:DIStatus.ok,msg:"授权成功",data:auths});
+    }
+  });
+  //res.json({code:DIStatus.ok,msg:"授权成功"});
+});
+
+/// search user
+/// search user for authority
+router.get('/:projectId/:userName/searchUser',function(req,res,next){
+  Project.searchUser(req.params.userName,req.params.projectId,function(error,user){
+    if(error)
+    {
+      res.json({code:error.code,msg:"查询用户失败"});
+      error.mode =0;
+      next(error);
+    }
+    else {
+      res.json({code:DIStatus.ok,msg:"查询成功",data:user});
+    }
+  });
+  //res.json({code:DIStatus.ok,msg:"授权成功"});
 });
 
 router.get('/:projectId/update',function(req,res,next){

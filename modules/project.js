@@ -3,6 +3,7 @@ var myUtil = require("./util");
 var diStatus = require("./diStatus");
 var COLNAME = "projects";
 var RCOLNAME = "authProjects";
+var UCOLNAME = "users";
 
 function Project(project)
 {
@@ -160,6 +161,75 @@ Project.remove = function(project_id,callback){
     });
   });
 }
+
+Project.updateAuth = function(user,projectAuth,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
+    }
+    db.collection(RCOLNAME,function(err,collection){
+      if(err)
+      {
+        return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenCollection,error:err});
+      }
+      collection.findOneAndUpdate({uid:projectAuth.uid,pid:projectAuth.pid},{$set:{authProject:projectAuth.authProject,author:user._id,updateTime:(new Date())}}, function(err, result){
+          if(err)
+          {
+            return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+          }
+          if(result.lastErrorObject.n==0)
+          {
+            collection.insertOne({uid:projectAuth.uid,pid:projectAuth.pid,author:user._id,_id:myUtil.guid(),authProject:projectAuth.authProject,createTime:(new Date())},function(err,result){
+              callback(err?{msg:"授权失败",code:diStatus.innerErrorOpenCollection,error:err}:err,projectAuth);
+            });
+          }
+          else {
+            callback(null,projectAuth);
+          }
+      });
+    });
+  });
+}
+
+Project.searchUser = function(username,project_id,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
+    }
+
+    db.collection(UCOLNAME,function(err,ucol){
+      ucol.find({username:username},{username:1,_id:1}).limit(1).next(function(error,user){
+        if(error)
+        {
+          return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
+        }
+        if(user)
+        {
+          db.collection(RCOLNAME,function(err,rcol){
+            rcol.find({uid:user._id,pid:project_id}).toArray(function(error,docs){
+              if(error)
+                return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
+              if(docs.length>0)
+              {
+                return callback(null,{msg:"用户已授权!",code:300});
+              }
+              else {
+                return callback(null,{msg:"查询用户成功",user:user,code:200});
+              }
+            });
+          });
+        }
+        else
+          return callback(null,{msg:"没有该用户",user:user,code:300});
+      });
+    });
+  });
+}
+
 Project.getAuth = function(project_id,user,callback){
   mongodb.open(function(err,db){
     if(err)
@@ -177,7 +247,7 @@ Project.getAuth = function(project_id,user,callback){
         callback(err?{msg:"查询失败",code:diStatus.innerErrorOpenCollection,error:err}:err,res);
       });
       */
-      rcollection.aggregate([{$match:{pid:project_id}},{$project:{projects:{uid:"$uid",authProject:"$authProject"},pid:"$pid",uid:"$uid"}},{$group:{_id:"$pid",projects:{$push:"$projects"},users:{$push:"$uid"}}}],function(err,result){
+      rcollection.aggregate([{$match:{pid:project_id}},{$project:{projects:{upd:"$_id",uid:"$uid",authProject:"$authProject"},pid:"$pid",uid:"$uid"}},{$group:{_id:"$pid",projects:{$push:"$projects"},users:{$push:"$uid"}}}],function(err,result){
         //console.log(JSON.stringify(result));
         if(err)
         {
