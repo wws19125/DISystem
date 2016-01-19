@@ -1,6 +1,8 @@
 var mongodb = require("./db");
 var myUtil = require("./util");
 var diStatus = require("./diStatus");
+var User = require("./user");
+
 var COLNAME = "projects";
 var RCOLNAME = "authProjects";
 var UCOLNAME = "users";
@@ -247,11 +249,15 @@ Project.getAuth = function(project_id,user,callback){
         callback(err?{msg:"查询失败",code:diStatus.innerErrorOpenCollection,error:err}:err,res);
       });
       */
-      rcollection.aggregate([{$match:{pid:project_id}},{$project:{projects:{upd:"$_id",uid:"$uid",authProject:"$authProject"},pid:"$pid",uid:"$uid"}},{$group:{_id:"$pid",projects:{$push:"$projects"},users:{$push:"$uid"}}}],function(err,result){
+      rcollection.aggregate([{$match:{pid:project_id,uid:{$ne:user._id}}},{$project:{projects:{upd:"$_id",uid:"$uid",authProject:"$authProject"},pid:"$pid",uid:"$uid"}},{$group:{_id:"$pid",projects:{$push:"$projects"},users:{$push:"$uid"}}}],function(err,result){
         //console.log(JSON.stringify(result));
         if(err)
         {
           return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+        }
+        if(result.length==0)
+        {
+          return callback(null,{projects:[]});
         }
         db.collection("users",function(err,collection){
           collection.find({_id:{$in:result[0].users}},{password:0}).toArray(function(err,docs){
@@ -265,6 +271,35 @@ Project.getAuth = function(project_id,user,callback){
           });
         });
         //return callback(null,null);
+      });
+    });
+  });
+};
+
+Project.getUserAuth = function(user,project_id,callback)
+{
+  var res = {authRole:user.authRole};
+  if(!project_id)
+    return callback(User.checkProjectAuth(res));
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback(User.checkProjectAuth(res));
+    }
+    db.collection(RCOLNAME,function(err,rcollection){
+      if(err)
+      {
+        return callback(User.checkProjectAuth(res));
+      }
+      rcollection.find({pid:project_id,uid:user._id}).limit(1).next(function(err,doc){
+        if(err)
+        {
+          return callback(User.checkProjectAuth(res));
+        }
+        res.authRole = user.authRole;
+        res.authProject = doc.authProject;
+        return callback(User.checkProjectAuth(res));
       });
     });
   });

@@ -3,7 +3,7 @@ var router = express.Router();
 //var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var DataInterface = require('../modules/dataInterface.js');
-var Project = require('../modules/project.js');
+var Project = require('../modules/project');
 var errorStatus = require("../modules/diStatus");
 var User = require('../modules/user');
 
@@ -57,17 +57,30 @@ router.get('/', function(req, res, next) {
     }
     else
     {
-      res.render('index',{ title :"DISystem",data:data});
+      res.render('index',{ title :"DISystem",data:data||{}});
     }
   });
 });
 
 /* GET interface detail page. */
 router.get('/:projectId/detail',function(req,res,next){
+  Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
+    if(!auths.canAccessProject)
+    {
+      res.status(403).send("<div><h1>权限不足</h1></div>");
+      return;
+    }
     res.render('diDetail',{title:"接口详细",projectId:req.params.projectId});
+  });
 });
 
 router.get('/project/new',function(req,res,next){
+  var auths = Project.getUserAuth(req.session.user);
+  if(!auths.canCreateProject)
+  {
+    res.status(403).send("<div><h1>权限不足</h1></div>");
+    return;
+  }
   res.render('projects/edit',{title:"新建项目"});
 });
 module.exports = router;

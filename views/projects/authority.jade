@@ -55,6 +55,7 @@ block header
           if(data.code==200)
           {
             var html = "";
+            if(!data.data.projects)return;
             data.data.projects.forEach(function(item,index){
               html += li.format(item.uid,item.authProject,data.data.users[item.uid],!!(item.authProject&0x80)?"#22aadd":"gray",!!(item.authProject&0x40)?"#22aadd":"gray",!!(item.authProject&0x20)?"#22aadd":"gray",!!(item.authProject&0x08)?"#22aadd":"gray",!!(item.authProject&0x04)?"#22aadd":"gray",!!(item.authProject&0x02)?"#22aadd":"gray",!!(item.authProject&0x01)?"#22aadd":"gray");
             });

@@ -3,17 +3,25 @@ var router = express.Router();
 var DataInterface = require('../modules/dataInterface');
 var diUtil = require('../modules/util.js');
 var diStatus = require('../modules/diStatus.js');
+var Project = require('../modules/project');
 
 router.get('/:projectId/list-for-project',function(req,res,next){
-  DataInterface.getByProjectId(req.params.projectId,function(error,data){
-    if(error)
+  Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
+    if(!auths.canAccessProject)
     {
-      console.log(error);
-      res.json({msg:"获取失败",statusCode:300});
+      res.json({code:DIStatus.authorityErrorOperation,msg:DIStatus.authorityErrorOperationMsg});
+      return;
     }
-    else {
-      res.json({msg:"ok",statusCode:200,dataContent:data});
-    }
+    DataInterface.getByProjectId(req.params.projectId,function(error,data){
+      if(error)
+      {
+        console.log(error);
+        res.json({msg:"获取失败",statusCode:300});
+      }
+      else {
+        res.json({msg:"ok",statusCode:200,dataContent:data});
+      }
+    });
   });
 });
 
@@ -24,36 +32,50 @@ router.get('/:_id/showdetail',function(req,res,next)
 
 /** add **/
 router.get('/:projectId/new',function(req,res,next){
-  res.render('datainterfaces/edit',{title:"添加接口",projectId:req.params.projectId});
+  Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
+    if(!auths.canCreateInterface)
+    {
+      res.status(403).send("<p>权限不足</p>");
+      return;
+    }
+    res.render('datainterfaces/edit',{title:"添加接口",projectId:req.params.projectId});
+  });
 });
 router.post('/:projectId/new',function(req,res,next){
-  if(req.body.dataBody)
-  {
-    try {
-      var di = JSON.parse(req.body.dataBody);
-      if(di.projectId!=req.params.projectId)
-      {
-        res.json({msg:err.reason,code:diStatus.innerError});
-        return;
-      }
-      di.status = 1;
-      di._id = diUtil.guid();
-      DataInterface.save(di,function(err,data){
-        if(err)
+  Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
+    if(!auths.canCreateInterface)
+    {
+      res.json({code:DIStatus.authorityErrorOperation,msg:DIStatus.authorityErrorOperationMsg});
+      return;
+    }
+    if(req.body.dataBody)
+    {
+      try {
+        var di = JSON.parse(req.body.dataBody);
+        if(di.projectId!=req.params.projectId)
         {
           res.json({msg:err.reason,code:diStatus.innerError});
+          return;
         }
-        else
-        {
-          res.json({msg:"success",code:diStatus.ok});
-        }
-      });
-    } catch (e) {
-      res.json({msg:err.reason,code:diStatus.innerError});
+        di.status = 1;
+        di._id = diUtil.guid();
+        DataInterface.save(di,function(err,data){
+          if(err)
+          {
+            res.json({msg:err.reason,code:diStatus.innerError});
+          }
+          else
+          {
+            res.json({msg:"success",code:diStatus.ok});
+          }
+        });
+      } catch (e) {
+        res.json({msg:err.reason,code:diStatus.innerError});
+      }
     }
-  }
-  else
-    res.json({msg:"发生异常：参数错误",code:diStatus.outterError});
+    else
+      res.json({msg:"发生异常：参数错误",code:diStatus.outterError});
+  });
 });
 
 /** update **/

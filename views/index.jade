@@ -57,7 +57,7 @@ block content
   body
     article
       ul
-        each val, index in (data.projects)
+        each val, index in (data?data.projects:[])
           li(id=val._id)
             div
               a(id=val._id)=val.name
