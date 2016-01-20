@@ -21,6 +21,10 @@
 var mongodb = require("./db");
 var util = require("./util");
 var test = require('assert');
+var User = require("./user");
+var Project = require("./project");
+var diStatus = require("./diStatus");
+
 var COLNAME = "datainterfaces";
 
 function DataInterface(di)
@@ -138,7 +142,24 @@ DataInterface.getByProjectId = function(projectId,callback)
     });
   });
 }
-
+DataInterface.remove = function(did,callback){
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
+    }
+    db.collection(COLNAME,function(err,collection){
+      if(err)
+      {
+        return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+      }
+      collection.deleteOne({_id:did},function(err,result){
+          return callback(err?{msg:"删除失败",code:diStatus.innerErrorOpenCollection,error:err}:err,result);
+      });
+    });
+  });
+};
 DataInterface.update = function(di,callback){
   mongodb.open(function(err,db){
     if(err)
@@ -172,6 +193,35 @@ DataInterface.changeStatus = function(di,status,callback){
       }
       collection.updateOne({_id:di._id},{$set:{status:status}},function(err,result){
           return callback(err?{reason:"delete: insert error",error:err}:err,result);
+      });
+    });
+  });
+};
+
+DataInterface.getAuth = function(user,dataInterfaceID,callback)
+{
+  var res = {authRole:user.authRole};
+  mongodb.open(function(err,db){
+    if(err)
+    {
+      mongodb.close();
+      return callback(User.checkProjectAuth(res));
+    }
+    db.collection(COLNAME,function(err,collection){
+      if(err)
+      {
+        return callback(User.checkProjectAuth(res));
+      }
+      collection.find({_id:dataInterfaceID}).limit(1).next(function(err,doc){
+        if(err)
+        {
+          return callback(User.checkProjectAuth(res));
+        }
+        if(doc)
+        {
+          //db.collection("")
+          Project.getUserAuth(user,doc.projectId,callback);
+        }
       });
     });
   });

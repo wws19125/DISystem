@@ -42,21 +42,19 @@ app.use(session({
   },
   */
   secret: 'keyboard cat',
-  cookie:{
-    maxAge: 60000
-  }
+
 }));
 
 app.use(function(req, res, next) {
 
-  /********************************
+  /********************************/
   var user = {
     _id: '7894c9c4-f0e2-2be3-d92d-d149c83610d0',
     username: 'admin',
     authRole: '1'
   };
   req.session.user = user;
-  ********************************/
+  /********************************/
 
   if(req.path=="/")
   {

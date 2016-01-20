@@ -36,7 +36,7 @@ var template = "<section>\
     </div>\
     <div class='di_operation'>\
       <a href='/di/{7}/update' style='color:#666;text-shadow:none;'>编辑</a>\
-      <a data-did='{7}'>删除</a>\
+      <a data-did='{7}' class='btn_delete'>删除</a>\
     </div>\
   </section>";
 var template_param = "<li><a>{0}</a><span>{1}</span></li>";
@@ -75,9 +75,28 @@ $(function(){
       type:'get',
       success:function(data){
         showDetail(data.dataContent);
+        $(".btn_delete").click(function(){
+          var did = this.dataset.did;
+          var self = this;
+          if(!did)return;
+          $.ajax({
+            url:'/di/{0}/delete'.format(did),
+            type:'delete',
+            success:function(data2){
+              DISystem.showTooltip(data2.msg);
+              if(data2.code==200)
+              {
+                $(self).parent().parent().remove();
+              }
+            },
+            error:function(){
+              DISystem.showTooltip("发生异常");
+            }
+          });
+        });
       },
       error:function(){
-
+        DISystem.showTooltip("发生错误");
       },
       complete:function(){
         //console.log(data);
@@ -108,7 +127,13 @@ $(function(){
       html += "<li><a href='#category{0}'>{1}、{2}</a></li>".format(i,i+1,item_title.innerHTML);
       item_title.setAttribute("name","category{0}".format(i));
     }
-    document.querySelector("aside").querySelector("ul").innerHTML = html;
+    var sd = document.querySelector("aside");
+    sd.querySelector("ul").innerHTML = html;
+    if((sd.clientHeight + 100) >= document.body.clientHeight)
+    {
+      sd.style.height = "90%";
+      sd.style.overflow = "scroll";
+    }
     html = "";
   }
     //postion

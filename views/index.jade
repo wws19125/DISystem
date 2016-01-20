@@ -24,6 +24,7 @@ block header
         window.location.href="/home/project/new";
       });
       $("li div").on("click","a",function(e){
+        if(this.id)return;
         e.stopPropagation();
         var _this = this;
         if(parseInt(this.dataset.index)==2)
