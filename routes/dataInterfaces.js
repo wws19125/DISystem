@@ -145,49 +145,74 @@ router.delete('/:dataInterfaceID/delete',function(req,res,next){
   });
 });
 
-router.get('/:dataInterfaceID/download',function(req,res,next){
-  var doc = new PDFDocument();
-  //doc.pipe = fs.createWriteStream('output.pdf')
-  var stream = doc.pipe(blobStream());
-  //# Embed a font, set the font size, and render some text
-  /*
-  doc.font('fonts/PalatinoBold.ttf')
-     .fontSize(25)
-     .text('Some text with an embedded font!', 100, 100)
-     */
+router.get('/:projectId/download',function(req,res,next){
+  Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
+    if(!auths.canDownPdf)
+    {
+      res.status(403).send("<h1>权限不足</h1>");
+      return;
+    }
+    DataInterface.getByProjectId(req.params.projectId,function(error,dis){
+      if(error)
+      {
+        res.send("<h1>发生错误</h1>");
+        return;
+      }
+      var doc = new PDFDocument();
+      doc.pipe(fs.createWriteStream('./output.pdf')).on('finish',function(){
+        /*
+        res.download("./output.pdf",function(err){
+          if(err)
+          {
+            res.send("<h1>发生错误</h1>");
+            console.log(err);
+          }
+        });
+        */
+        var options = {
+          root: './',
+          dotfiles: 'deny',
+          headers: {
+            'x-timestamp': Date.now(),
+            'x-sent': true
+          }
+        };
+        res.sendFile("output.pdf", options, function (err) {
+          if (err) {
+            console.log(err);
+            res.status(err.status).end();
+          }
+          else {
+            console.log('Sent:file');
+            fs.unlink("./output.pdf");
+          }
+        });
+      });
+      //doc.registerFont('arial', path.join(__dirname + '/Arial.ttf'), 'arial');
+      //doc.registerFont('arial2', path.join(__dirname + '/Arial.ttf'), 'arial');
+      //doc.font('arial');
 
-  //# Add another page
-  doc.addPage()
-     .fontSize(25)
-     .text('Here is some vector graphics...', 100, 100)
+      // HACK: clear font cache for real font name
+      delete doc._fontFamilies['ArialUnicodeMS'];
+      //doc.font('fonts/msyh.ttf').fontSize(25).text('接口文档', {width:450,align:'center'});
+      doc.font('fonts/msyh.ttf').fontSize(25).text('接口文档', {width:450,align:'center'});
+      doc.addPage().fontSize(12);
+      dis.forEach(function(item,index){
+        console.log(item);
+        doc.fillColor("#333333").text("接口名称:",{continued:true}).fillColor("red").text(item.name);//.moveDown(0.5);
+        doc.fillColor("#333333").text("接口格式:",{continued:true}).fillColor("red").text(item.format);
+        doc.fillColor("#333333").text("接口说明:",{continued:true}).fillColor("red").text(item.intro);
+        doc.fillColor("#333333").text("接口方式:",{continued:true}).fillColor("red").text(item.method);
+        doc.fillColor("#333333").text("接口参数:");//,{continued:true}).fillColor("red").text(item.format);
+        item.params.forEach(function(param,pidx){
+          doc.fillColor("green").text("    "+param.name,{continued:true}).fillColor("red").text("  "+param.intro);
+        });
+        doc.fillColor("#333333").text("接口返回值:");
 
-  //# Draw a triangle
-  doc.save()
-     .moveTo(100, 150)
-     .lineTo(100, 250)
-     .lineTo(200, 250)
-     .fill("#FF3300")
-
-  //# Apply some transforms and render an SVG path with the 'even-odd' fill rule
-  doc.scale(0.6)
-     .translate(470, -380)
-     .path('M 250,75 L 323,301 131,161 369,161 177,301 z')
-     .fill('red', 'even-odd')
-     .restore()
-
-  //# Add some text with annotations
-  doc.addPage()
-     .fillColor("blue")
-     .text('Here is a link!', 100, 100)
-     .underline(100, 100, 160, 27, {color:"#0000FF"})
-     .link(100, 100, 160, 27, 'http://google.com/')
-
-   //# Finalize PDF file
-  doc.end();
-  //var blobStream = require('blob-stream');
-  //var stream = doc.pipe(blobStream());
-  stream.on('finish', function() {
-    res.redirect(stream.toBlobURL('application/pdf'));
+        doc.moveDown(5);
+      });
+      doc.end();
+    });
   });
 });
 module.exports = router;
