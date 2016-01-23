@@ -4,9 +4,10 @@ var DataInterface = require('../modules/dataInterface');
 var diUtil = require('../modules/util.js');
 var diStatus = require('../modules/diStatus.js');
 var Project = require('../modules/project');
-var PDFDocument = require("pdfkit");
+//var PDFDocument = require("pdfkit");
 var fs = require("fs");
-var blobStream = require('blob-stream');
+//var blobStream = require('blob-stream');
+var officegen = require("officegen");
 
 router.get('/:projectId/list-for-project',function(req,res,next){
   Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
@@ -158,17 +159,145 @@ router.get('/:projectId/download',function(req,res,next){
         res.send("<h1>发生错误</h1>");
         return;
       }
+      var docx = officegen ( 'docx' );
+      docx.on ( 'finalize', function ( written ) {
+        console.log ( 'Finish to create Word file.\nTotal bytes created: ' + written + '\n' );
+      });
+      docx.on ( 'error', function ( err ) {
+        console.log ( err );
+        res.send("<h1>发生错误</h1>");
+      });
+      var body = docx.createP({align:"center"});
+      body.addText("接口文档",{ bold: true,font_face: 'Arial', font_size: 18 });
+
+      docx.putPageBreak();
+
+      dis.forEach(function(item,index){
+        //console.log(item);
+        body = docx.createP();
+        body.addText("接口名称:",{bold: true,color:"#333333"});
+        body.addText(item.name,{color:"red"});
+
+        body.addLineBreak();
+        body.addText("接口格式:",{bold: true,color:"#333333"});
+        body.addText(item.format,{color:"red"});
+
+        body.addLineBreak();
+        body.addText("接口说明:",{bold: true,color:"#333333"});
+        body.addText(item.intro,{color:"red"});
+
+        body.addLineBreak();
+        body.addText("接口方式",{bold: true,color:"#333333"});
+        body.addText(item.method||"GET",{color:"red"});
+
+        body.addLineBreak();
+        body.addText("接口参数",{bold: true,color:"#333333"});
+        item.params.forEach(function(param,pidx){
+          body.addLineBreak();
+          body.addText("    "+param.name,{color:"green"});
+          body.addText("  "+param.intro,{color:"red"});
+        });
+        body.addLineBreak();
+        body.addText("返回值",{bold: true,color:"#333333"});
+        body.addLineBreak();
+        showReturn(item.retContent,0,body);
+
+        for(var i=0;i<5;i++)
+          body.addLineBreak();
+      });
+      var out = fs.createWriteStream ( 'out.docx' );// 文件写入
+      out.on ( 'error', function ( err ) {
+          console.log ( err );
+      });
+      var result = docx.generate(out);// 服务端生成word
+      res.writeHead ( 200, {
+          // 注意这里的type设置，导出不同文件type值不同application/vnd.openxmlformats-officedocument.presentationml.presentation
+          "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          'Content-disposition': 'attachment; filename=out.docx'
+      });
+      docx.generate (res);// 客户端导出word
+      fs.unlink("out.docx");
+    });
+  });
+});
+function tabString(deep)
+{
+  var str = "";
+  for(var i=0;i<deep;i++)
+  {
+    str += "    ";
+  }
+  return str;
+}
+function showReturn(jsonData,deep,docx){
+  if(typeof jsonData=="object")
+  {
+    if(jsonData instanceof Array)
+    {
+      if((!(jsonData[0] instanceof Array)&&(typeof jsonData[0])!="object")||jsonData.length==0)
+      {
+          // html += "&nbsp;<input type='text' value='{0}' data-path='{1}' />".format(jsonData[0]||"数组",objName);
+          docx.addText("{0}[".format(tabString(deep)));
+          docx.addLineBreak();
+          docx.addText(jsonData[0]||"数组");
+          docx.addLineBreak();
+          docx.addText("{0}]".format(tabString(deep)));
+      }
+      else
+      {
+        //jsonData.splice(1,jsonData.length-1);
+        docx.addLineBreak();
+        docx.addText("{0}[".format(tabString(deep)));
+        showReturn(jsonData[0],deep+1,docx);
+        docx.addText("{0}]".format(tabString(deep)));
+        docx.addLineBreak();
+      }
+    }
+    else
+    {
+      docx.addLineBreak();
+      docx.addText("{0}{".format(tabString(deep)));
+      docx.addLineBreak();
+      for(var item in jsonData)
+      {
+        docx.addText(tabString(deep+1)+item+"  ",{color:"green"});
+        showReturn(jsonData[item],deep+1,docx);
+      }
+      docx.addText(tabString(deep)+"}");
+      docx.addLineBreak();
+    }
+  }
+  else
+  {
+    docx.addText((" "+jsonData)||"无返回值");
+    docx.addLineBreak();
+  }
+};
+/*
+router.get('/:projectId/download',function(req,res,next){
+  Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
+    if(!auths.canDownPdf)
+    {
+      res.status(403).send("<h1>权限不足</h1>");
+      return;
+    }
+    DataInterface.getByProjectId(req.params.projectId,function(error,dis){
+      if(error)
+      {
+        res.send("<h1>发生错误</h1>");
+        return;
+      }
       var doc = new PDFDocument();
       doc.pipe(fs.createWriteStream('./output.pdf')).on('finish',function(){
-        /*
-        res.download("./output.pdf",function(err){
-          if(err)
-          {
-            res.send("<h1>发生错误</h1>");
-            console.log(err);
-          }
-        });
-        */
+
+        //res.download("./output.pdf",function(err){
+          //if(err)
+          //{
+            //res.send("<h1>发生错误</h1>");
+            //console.log(err);
+          //}
+        //});
+
         var options = {
           root: './',
           dotfiles: 'deny',
@@ -195,7 +324,7 @@ router.get('/:projectId/download',function(req,res,next){
       // HACK: clear font cache for real font name
       delete doc._fontFamilies['ArialUnicodeMS'];
       //doc.font('fonts/msyh.ttf').fontSize(25).text('接口文档', {width:450,align:'center'});
-      doc.font('fonts/msyh.ttf').fontSize(25).text('接口文档', {width:450,align:'center'});
+      doc.font('fonts/Arial Unicode.ttf').fontSize(25).text('接口文档', {width:450,align:'center'});
       doc.addPage().fontSize(12);
       dis.forEach(function(item,index){
         console.log(item);
@@ -215,4 +344,5 @@ router.get('/:projectId/download',function(req,res,next){
     });
   });
 });
+*/
 module.exports = router;
