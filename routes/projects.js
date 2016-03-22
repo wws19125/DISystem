@@ -57,7 +57,7 @@ router.get('/:projectId/authority',function(req,res,next){
       {
         if(!auths.canAuthProject)
         {
-          res.status(403).sender("<p>权限不足</p>");
+          res.status(403).send("<p>权限不足</p>");
           //res.json({code:DIStatus.authorityErrorOperation,msg:DIStatus.authorityErrorOperationMsg});
           return;
         }
@@ -80,7 +80,7 @@ router.put('/:projectId/authority',function(req,res,next){
       res.json({code:DIStatus.ok,msg:"无法对自己授权"});
       return;
     }
-    Project.updateAuth(req.session.user,{uid:req.body.uid,authProject:req.body.auths,pid:req.params.projectId},function(error,auths){
+    Project.updateAuth(req.session.user,{uid:req.body.uid,authProject:parseInt(req.body.auths),pid:req.params.projectId},function(error,auths){
       if(error)
       {
         res.json({code:error.code,msg:"授权失败"});

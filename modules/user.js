@@ -158,7 +158,7 @@ User.authRole = function(user,callback)
 User.checkProjectAuth = function(user){
   var auth = {
     canAccessManager:!!(user.authRole&0x4),  //是有管理权限
-    canCreateProject:!!(user.authRole&0x20), //创建项目权限
+    canCreateProject:!!(user.authRole&0x2), //创建项目权限
 
     canAccessProject:false, //查看项目
     canAuthProject:false, //授权项目

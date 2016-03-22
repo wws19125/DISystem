@@ -13,7 +13,7 @@ router.get('/:projectId/list-for-project',function(req,res,next){
   Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
     if(!auths.canAccessProject)
     {
-      res.json({code:DIStatus.authorityErrorOperation,msg:DIStatus.authorityErrorOperationMsg});
+      res.json({code:diStatus.authorityErrorOperation,msg:diStatus.authorityErrorOperationMsg});
       return;
     }
     DataInterface.getByProjectId(req.params.projectId,function(error,data){
@@ -49,7 +49,7 @@ router.post('/:projectId/new',function(req,res,next){
   Project.getUserAuth(req.session.user,req.params.projectId,function(auths){
     if(!auths.canCreateInterface)
     {
-      res.json({code:DIStatus.authorityErrorOperation,msg:DIStatus.authorityErrorOperationMsg});
+      res.json({code:diStatus.authorityErrorOperation,msg:diStatus.authorityErrorOperationMsg});
       return;
     }
     if(req.body.dataBody)
@@ -87,7 +87,7 @@ router.get('/:dataInterfaceID/update',function(req,res,next){
   DataInterface.getAuth(req.session.user,req.params.dataInterfaceID,function(auths){
     if(!auths.canEditInterface)
     {
-      res.status(403).sender("<p>权限不足</p>");
+      res.status(403).send("<p>权限不足</p>");
       return;
     }
     DataInterface.getById(req.params.dataInterfaceID,function(err,di){
@@ -105,7 +105,7 @@ router.put('/:dataInterfaceID/update',function(req,res,next){
   DataInterface.getAuth(req.session.user,req.params.dataInterfaceID,function(auths){
     if(!auths.canEditInterface)
     {
-      res.json({code:DIStatus.authorityErrorOperation,msg:DIStatus.authorityErrorOperationMsg});
+      res.json({code:diStatus.authorityErrorOperation,msg:diStatus.authorityErrorOperationMsg});
       return;
     }
     var di = JSON.parse(req.body.dataBody);
@@ -125,9 +125,9 @@ router.put('/:dataInterfaceID/update',function(req,res,next){
 
 router.delete('/:dataInterfaceID/delete',function(req,res,next){
   DataInterface.getAuth(req.session.user,req.params.dataInterfaceID,function(auths){
-    if(!auths.canEditInterface)
+    if(!auths.canDeleteInterface)
     {
-      res.json({code:DIStatus.authorityErrorOperation,msg:DIStatus.authorityErrorOperationMsg});
+      res.json({code:diStatus.authorityErrorOperation,msg:diStatus.authorityErrorOperationMsg});
       return;
     }
     //var di = JSON.parse(req.body.dataBody);
@@ -137,7 +137,6 @@ router.delete('/:dataInterfaceID/delete',function(req,res,next){
           res.json({msg:"删除失败",code:error.code});
           error.mode =0;
           console.log(error);
-          //next(error);
       }
       else {
         res.json({msg:"删除成功",code:diStatus.ok});
@@ -205,7 +204,7 @@ router.get('/:projectId/download',function(req,res,next){
         for(var i=0;i<5;i++)
           body.addLineBreak();
       });
-      var out = fs.createWriteStream ( 'out.docx' );// 文件写入
+      var out = fs.createWriteStream ( 'datainterface.docx' );// 文件写入
       out.on ( 'error', function ( err ) {
           console.log ( err );
       });
@@ -213,10 +212,10 @@ router.get('/:projectId/download',function(req,res,next){
       res.writeHead ( 200, {
           // 注意这里的type设置，导出不同文件type值不同application/vnd.openxmlformats-officedocument.presentationml.presentation
           "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          'Content-disposition': 'attachment; filename=out.docx'
+          'Content-disposition': 'attachment; filename=datainterface.docx'
       });
       docx.generate (res);// 客户端导出word
-      fs.unlink("out.docx");
+      fs.unlink("datainterface.docx");
     });
   });
 });

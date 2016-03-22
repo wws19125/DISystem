@@ -75,12 +75,14 @@ router.get('/:projectId/detail',function(req,res,next){
 });
 
 router.get('/project/new',function(req,res,next){
-  var auths = Project.getUserAuth(req.session.user);
-  if(!auths.canCreateProject)
-  {
-    res.status(403).send("<div><h1>权限不足</h1></div>");
-    return;
-  }
-  res.render('projects/edit',{title:"新建项目"});
+  Project.getUserAuth(req.session.user,null,function(auths){
+    if(!auths.canCreateProject)
+    {
+      res.status(403).send("<div><h1>权限不足</h1></div>");
+      return;
+    }
+    res.render('projects/edit',{title:"新建项目"});
+  });
+
 });
 module.exports = router;

@@ -47,14 +47,14 @@ app.use(session({
 
 app.use(function(req, res, next) {
 
-  /********************************/
+  /********************************
   var user = {
-    _id: '7894c9c4-f0e2-2be3-d92d-d149c83610d0',
-    username: 'admin',
-    authRole: '1'
+    _id: '46a3fd73-0144-9d6f-7069-e2ae4545a159',
+    username: 'admin22',
+    authRole: '2'
   };
   req.session.user = user;
-  /********************************/
+  ********************************/
 
   if(req.path=="/")
   {
