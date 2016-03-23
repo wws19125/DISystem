@@ -57,6 +57,7 @@ block header
                 _this.remove();
               }
             }
+            if(!sdata.url)return;
             $.ajax({
               url:sdata.url,
               type:sdata.type,
@@ -112,8 +113,9 @@ block header
                         </div>\
                       </div>";
           $("body").append(html);
-          $(".mask_div").on("click","a",function(){
-            if(this.classList.contains('btn_ok'))
+          $(".mask_div").on("click",function(e){
+            var target = e.srcElement||e.target;
+            if(target.classList.contains('btn_ok'))
             {
               var username = $("#txt_username").val();
               var password = $("#txt_password").val();
@@ -158,17 +160,19 @@ block header
               $(".mask_div").remove();
               return;
             }
-            if(this.classList.contains("user_allowCreate"))
+            if(target.classList.contains("user_allowCreate"))
             {
               this.classList.remove("user_allowCreate");
               this.classList.add("user_notallowCreate");
             }
             else
-              if(this.classList.contains("user_notallowCreate"))
+              if(target.classList.contains("user_notallowCreate"))
             {
               this.classList.remove("user_notallowCreate");
               this.classList.add("user_allowCreate");
             }
+            else
+              $(".mask_div").remove();
           });
         }
       });
