@@ -171,17 +171,15 @@ User.checkProjectAuth = function(user){
     canDownPdf:false //下载接口
 
   };
-  if(user.authProject)
-  {
-    auth.canAccessProject = !!(user.authProject&0x80);
-    auth.canAuthProject = !!(user.authProject&0x40);
-    auth.canEditProject = !!(user.authProject&0x20);
-    auth.canDeleteProject = !!(user.authProject&0x10);
+    auth.canAccessProject = auth.canAccessManager||!!(user.authProject&0x80);
+    auth.canAuthProject = auth.canAccessManager||!!(user.authProject&0x40);
+    auth.canEditProject = auth.canAccessManager||!!(user.authProject&0x20);
+    auth.canDeleteProject = auth.canAccessManager||!!(user.authProject&0x10);
 
-    auth.canCreateInterface = !!(user.authProject&0x08);
-    auth.canEditInterface = !!(user.authProject&0x04);
-    auth.canDeleteInterface = !!(user.authProject&0x02);
-    auth.canDownPdf = !!(user.authProject&0x01);
-  }
+    auth.canCreateInterface = auth.canAccessManager||!!(user.authProject&0x08);
+    auth.canEditInterface = auth.canAccessManager||!!(user.authProject&0x04);
+    auth.canDeleteInterface = auth.canAccessManager||!!(user.authProject&0x02);
+    auth.canDownPdf = auth.canAccessManager||!!(user.authProject&0x01);
+
   return auth;
 };

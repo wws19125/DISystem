@@ -2,6 +2,7 @@ var mongodb = require("./db");
 var myUtil = require("./util");
 var diStatus = require("./diStatus");
 var User = require("./user");
+var authority = require("./authority");
 
 var COLNAME = "projects";
 var RCOLNAME = "authProjects";
@@ -26,12 +27,34 @@ Project.get = function(user,callback){
       mongodb.close();
       return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenDB,error:err});
     }
+    if(user.authRole&authority.authorityAccessManager)
+    {
+      db.collection(COLNAME,function(err,collection){
+        if(err)
+        {
+          return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenCollection,error:err});
+        }
+        collection.find().toArray(function(err,docs){
+          if(err)
+          {
+            return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
+          }
+          var auths = [];
+          docs.forEach(function(item,index){
+            auths[item._id] = authority.authoritySuperAdminProject;
+          });
+          return callback(err,{auths:auths,projects:docs});
+        });
+      });
+      return;
+    }
+
     db.collection(RCOLNAME,function(err,rcollection){
       if(err)
       {
         return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOpenCollection,error:err});
       }
-      rcollection.aggregate([{$match:{uid:user._id,authProject:{$gte:0x80}}},{$project:{_id:1,auths:{pid:"$pid",auth:"$authProject"},pid:1,uid:1}},{$group:{_id:"$uid",pids:{$push:"$pid"},auths:{$push:"$auths"}}}],function(err,res){
+      rcollection.aggregate([{$match:{uid:user._id,authProject:{$gte:authority.authorityAccessProject}}},{$project:{_id:1,auths:{pid:"$pid",auth:"$authProject"},pid:1,uid:1}},{$group:{_id:"$uid",pids:{$push:"$pid"},auths:{$push:"$auths"}}}],function(err,res){
         if(err)
         {
           return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
@@ -149,7 +172,7 @@ Project.remove = function(project_id,callback){
           return callback({msg:"删除失败",code:diStatus.innerErrorOperationCollection,error:err},result);
         }
         else {
-          db.collection(RCOLNAME,function(err,collection){
+          db.collection(COLNAME,function(err,collection){
             if(err)
             {
               return callback({msg:diStatus.innerErrorMsg,code:diStatus.innerErrorOperationCollection,error:err});
@@ -281,6 +304,10 @@ Project.getUserAuth = function(user,project_id,callback)
   var res = {authRole:user.authRole};
   if(!project_id)
     return callback(User.checkProjectAuth(res));
+  if(user.authRole&authority.authorityAccessManager)
+  {
+    return callback(User.checkProjectAuth(user));
+  }
   mongodb.open(function(err,db){
     if(err)
     {

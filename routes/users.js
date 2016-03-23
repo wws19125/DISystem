@@ -78,7 +78,7 @@ router.put('/resetPassword',function(req,res,next){
   });
 });
 router.put('/authRole',function(req,res,next){
-  var user = {username:req.body.username,_id:req.body._id,authRole:req.body.authRole};
+  var user = {username:req.body.username,_id:req.body._id,authRole:parseInt(req.body.authRole)};
   User.authRole(user,function(err,result){
     if(err)
     {
