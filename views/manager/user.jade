@@ -115,6 +115,7 @@ block header
           $("body").append(html);
           $(".mask_div").on("click",function(e){
             var target = e.srcElement||e.target;
+            if(target.tagName=="INPUT")return;
             if(target.classList.contains('btn_ok'))
             {
               var username = $("#txt_username").val();
