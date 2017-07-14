@@ -138,7 +138,7 @@ DataInterface.getByProjectId = function(projectId,callback)
       {
         return callback({reason:"open collection error",error:err,status:-1});
       }
-      collection.find({projectId:projectId}).toArray(callback);
+      collection.find({projectId:projectId}).sort({seq:1}).toArray(callback);
     });
   });
 }

@@ -56,6 +56,7 @@ router.post('/:projectId/new',function(req,res,next){
     {
       try {
         var di = JSON.parse(req.body.dataBody);
+        di.seq = (di.seq&&!isNaN(di.seq)) ? parseInt(di.seq) : 100000;
         if(di.projectId!=req.params.projectId)
         {
           res.json({msg:err.reason,code:diStatus.innerError});
@@ -108,7 +109,9 @@ router.put('/:dataInterfaceID/update',function(req,res,next){
       res.json({code:diStatus.authorityErrorOperation,msg:diStatus.authorityErrorOperationMsg});
       return;
     }
+    //var di = JSON.parse(req.body.dataBody);
     var di = JSON.parse(req.body.dataBody);
+    di.seq = (di.seq&&!isNaN(di.seq)) ? parseInt(di.seq) : 100000;
     DataInterface.update(di,function(err,result){
       if(err)
       {

@@ -31,7 +31,11 @@ block header
       outline:none;
       border:none;
       border-bottom:solid 1px #ccc;
-      width:98%;
+      /*width:98%;*/
+      flex:1;
+      -moz-box-flex: 1;
+      -webkit-box-flex: 1;
+      box-flex: 1;
     }
     article > div > div > a
     {
@@ -75,7 +79,7 @@ block header
       margin-top:10px;
       margin-bottom:10px;
     }
-    .di_param_field
+    .di_input,.flexLayout,.di_param_field
     {
       display: -moz-box;
       display: -webkit-box;
@@ -85,6 +89,7 @@ block header
     .di_param_field > input:nth-of-type(1)
     {
       width:100px;
+      margin-right:30px;
     }
     .di_param_field > input:nth-of-type(2)
     {
@@ -247,6 +252,7 @@ block header
             format:$("input#di_format").val(),
             intro:$("input#di_intro").val(),
             method:$("a.method-selected").html(),
+            seq:$("input#di_seq").val(),
             params:getParam(),
             retContent:returnContent
           };
@@ -294,8 +300,9 @@ block content
   //- var _di=di||{}
   article(data-pid=projectId,data-did=datainterface?datainterface._id:"-1")
     div
-      div.di_input
+      div.di_input.flexLayout
         input#di_name(type='text',placeHolder="接口名称",data-need="true",value=datainterface?datainterface.name:"")
+        input#di_seq(type='text',placeHolder="接口排序",value=datainterface?datainterface.seq:100000,style="margin-left:30px;width:100px;flex:0;box-sizing:content;")
       div.di_input
         input#di_format(type='text',placeHolder="接口格式",data-need="true",value=datainterface?datainterface.format:"")
       div.di_input
@@ -310,16 +317,12 @@ block content
           each val in datainterface.params
             div.di_param_field
               input.di_param_name_input(type='text',placeHolder='参数',value=val.name)
-              &nbsp
               input(type='text',placeHolder='参数说明',value=val.intro)
-              &nbsp;
               a.a_btn_delete
         else
           div.di_param_field
             input.di_param_name_input(type='text',placeHolder='参数')
-            &nbsp
             input(type='text',placeHolder='参数说明')
-            &nbsp;
             a.a_btn_delete
         a.di_add_param 添加参数
       div.di_retContent
